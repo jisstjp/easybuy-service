@@ -23,6 +23,13 @@ public class Brand {
 	@Column(name = "logo_url")
 	private String logoUrl;
 
+	@Column(name = "is_deleted")
+	private boolean deleted;
+
+	private Long updatedBy;
+
+	private Long createdBy;
+
 	public Long getId() {
 		return id;
 	}
@@ -53,6 +60,30 @@ public class Brand {
 
 	public void setLogoUrl(String logoUrl) {
 		this.logoUrl = logoUrl;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Long getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(Long updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Long getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(Long createdBy) {
+		this.createdBy = createdBy;
 	}
 
 }

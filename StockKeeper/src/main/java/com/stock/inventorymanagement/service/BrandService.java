@@ -1,19 +1,18 @@
 package com.stock.inventorymanagement.service;
 
 import java.util.List;
-
-import com.stock.inventorymanagement.domain.Brand;
+import com.stock.inventorymanagement.dto.BrandDto;
 
 public interface BrandService {
 
-	List<Brand> getAllBrands();
+	List<BrandDto> getAllBrands();
 
-	Brand getBrandById(Long id);
+	BrandDto getBrandById(Long id);
 
-	Brand createBrand(Brand brand);
+	BrandDto createBrand(BrandDto brandDto,Long userId);
 
-	Brand updateBrand(Long id, Brand brand);
+	BrandDto updateBrand(Long id, BrandDto brandDto,Long userId);
 
-	void deleteBrand(Long id);
+	void deleteBrand(Long id,Long userId);
 
 }

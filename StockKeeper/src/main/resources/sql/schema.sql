@@ -111,3 +111,15 @@ CREATE TABLE products (
 INSERT INTO products (name, description, brand_id, category_id, subcategory_id, sku, price, quantity, weight, manufacturer, length, width, height, image_url) VALUES
 ('Samsung S21', 'A premium Android phone with 5G support and 120Hz refresh rate', 4, 1, 1, 'SAMS21', 799.99, 50, 0.18, 'Samsung', 6.24, 2.90, 0.31, 'https://example.com/images/samsung-galaxy-s21.jpg');
 
+
+
+ALTER TABLE brands ADD COLUMN is_deleted BOOLEAN NOT NULL DEFAULT false;
+
+
+ALTER TABLE brands
+ADD created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD updated_at TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+ADD updated_by BIGINT(20) DEFAULT NULL;
+
+ALTER TABLE brands ADD created_by BIGINT(20) DEFAULT NULL;
+

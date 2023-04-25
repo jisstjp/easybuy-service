@@ -1,13 +1,18 @@
 package com.stock.inventorymanagement.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.stock.inventorymanagement.domain.Brand;
+import com.stock.inventorymanagement.dto.BrandDto;
+import com.stock.inventorymanagement.mapper.BrandMapper;
 import com.stock.inventorymanagement.repository.BrandRepository;
 import com.stock.inventorymanagement.service.BrandService;
 
@@ -16,36 +21,56 @@ public class BrandServiceImpl implements BrandService {
 	
 	@Autowired
 	private BrandRepository brandRepository;
+	
+    @Autowired
+    private BrandMapper brandMapper;
 
 	@Override
-	public List<Brand> getAllBrands() {
-		return brandRepository.findAll();
+	@Transactional(readOnly = true)
+	public List<BrandDto> getAllBrands() {
+		   List<Brand> brands = brandRepository.findAll();
+	    return brands.stream().map(brandMapper::toDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public Brand getBrandById(Long id) {
-		return brandRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Brand not found with id: " + id));
+	@Transactional(readOnly = true)
+	public BrandDto getBrandById(Long id) {
+		 Brand brand = brandRepository.findById(id)
+		            .orElseThrow(() -> new EntityNotFoundException("Brand not found with id: " + id));
+		    return brandMapper.toDto(brand);
 	}
 
 	@Override
-	public Brand createBrand(Brand brand) {
-		return brandRepository.save(brand);
+	@Transactional(propagation = Propagation.REQUIRED)
+	public BrandDto createBrand(BrandDto brandDto,Long userId) {
+		 Brand brand = brandMapper.toEntity(brandDto);
+		 brand.setCreatedBy(userId);
+	       brand.setUpdatedBy(userId);
+		 Brand createdBrand = brandRepository.save(brand);
+		 return brandMapper.toDto(createdBrand);
 	}
 
 	@Override
-	public Brand updateBrand(Long id, Brand brand) {
-		Brand existingBrand = getBrandById(id);
-		existingBrand.setName(brand.getName());
-		existingBrand.setDescription(brand.getDescription());
-		existingBrand.setLogoUrl(brand.getLogoUrl());
-		return brandRepository.save(existingBrand);
+	@Transactional(propagation = Propagation.REQUIRED)
+	public BrandDto updateBrand(Long id, BrandDto brandDto,Long userId) {
+		   Brand existingBrand = brandRepository.findById(id)
+	                .orElseThrow(() -> new EntityNotFoundException("Brand not found with id: " + id));
+	        existingBrand.setName(brandDto.getName());
+	        existingBrand.setDescription(brandDto.getDescription());
+	        existingBrand.setLogoUrl(brandDto.getLogoUrl());
+	        existingBrand.setUpdatedBy(userId);
+	        Brand updatedBrand = brandRepository.save(existingBrand);
+	        return brandMapper.toDto(updatedBrand);
 	}
 
 	@Override
-	public void deleteBrand(Long id) {
-		Brand existingBrand = getBrandById(id);
-		brandRepository.delete(existingBrand);
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteBrand(Long id,Long userId) {
+		 Brand existingBrand = brandRepository.findById(id)
+		            .orElseThrow(() -> new EntityNotFoundException("Brand not found with id: " + id));
+		 existingBrand.setUpdatedBy(userId);
+		 existingBrand.setDeleted(true);
+		    brandRepository.save(existingBrand);
 	}
 
 }
