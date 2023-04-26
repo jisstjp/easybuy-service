@@ -1,0 +1,70 @@
+1.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjU0NzIxOCwiaWF0IjoxNjgyNTQzNjE4fQ.zVqjPRo7X8ZVN-i-Wmy94HRhCgmeE-U042XzhezTszr6cGfyX-X4Up93jSLjmV-t4zuRVHogeRwdtdT6raB58g");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/categories", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+2.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjU0NzIxOCwiaWF0IjoxNjgyNTQzNjE4fQ.zVqjPRo7X8ZVN-i-Wmy94HRhCgmeE-U042XzhezTszr6cGfyX-X4Up93jSLjmV-t4zuRVHogeRwdtdT6raB58g");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/categories/3", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error))
+  
+3.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjU0NzIxOCwiaWF0IjoxNjgyNTQzNjE4fQ.zVqjPRo7X8ZVN-i-Wmy94HRhCgmeE-U042XzhezTszr6cGfyX-X4Up93jSLjmV-t4zuRVHogeRwdtdT6raB58g");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "name": "Home & Kitchen",
+  "description": "Category for all home and kitchen products"
+});
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/categories", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+  4.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjU0NzIxOCwiaWF0IjoxNjgyNTQzNjE4fQ.zVqjPRo7X8ZVN-i-Wmy94HRhCgmeE-U042XzhezTszr6cGfyX-X4Up93jSLjmV-t4zuRVHogeRwdtdT6raB58g");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "id": 3,
+  "name": "Home & Kitchen",
+  "description": "Category for all type of home and kitchen products"
+});
+
+var requestOptions = {
+  method: 'PUT',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/categories/3", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));

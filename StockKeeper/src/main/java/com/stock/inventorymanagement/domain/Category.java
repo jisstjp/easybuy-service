@@ -26,6 +26,9 @@ public class Category {
 	@Column(name = "updatedBy")
 	private Long updatedBy;
 
+	@Column(name = "is_deleted")
+	private boolean deleted;
+
 	public Long getId() {
 		return id;
 	}
@@ -64,6 +67,14 @@ public class Category {
 
 	public void setUpdatedBy(Long updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 }
