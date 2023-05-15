@@ -148,3 +148,103 @@ ADD created_by BIGINT,
 ADD updated_by BIGINT,
 ADD is_deleted TINYINT(1) DEFAULT 0;
 
+
+ALTER TABLE products ADD COLUMN   upc VARCHAR(50) NOT NULL;
+
+ALTER TABLE products ADD COLUMN quantity_in_box INT(11) NOT NULL DEFAULT 0 AFTER quantity;
+ALTER TABLE products ADD COLUMN is_available TINYINT(1) NOT NULL DEFAULT 1 AFTER updated_by;
+
+
+CREATE TABLE prices (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  product_id INT(11) NOT NULL,
+  price_type VARCHAR(50) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT(20) DEFAULT NULL,
+  updated_by BIGINT(20) DEFAULT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+
+ALTER TABLE prices ADD currency_code VARCHAR(10) NOT NULL DEFAULT 'USD' AFTER price;
+
+CREATE TABLE vendors (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  address TEXT,
+  phone_number VARCHAR(20),
+  email VARCHAR(255),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT(20) DEFAULT NULL,
+  updated_by BIGINT(20) DEFAULT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id)
+);
+
+INSERT INTO vendors (name, address, phone_number, email) 
+VALUES ('Vendor A', '123 Main Street', '555-1234', 'vendorA@example.com'),
+       ('Vendor B', '456 Oak Avenue', '555-5678', 'vendorB@example.com'),
+       ('Vendor C', '789 Elm Boulevard', '555-9012', 'vendorC@example.com');
+       
+       
+       
+             
+ CREATE TABLE purchase_orders (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  vendor_id INT(11) NOT NULL,
+  order_date DATE NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT(20) DEFAULT NULL,
+  updated_by BIGINT(20) DEFAULT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  FOREIGN KEY (vendor_id) REFERENCES vendors(id)
+);
+
+ALTER TABLE purchase_orders ADD currency_code VARCHAR(3) NOT NULL DEFAULT 'USD';
+
+
+
+      INSERT INTO purchase_orders (vendor_id, order_date, total_amount, created_at, updated_at, created_by, updated_by, is_deleted, currency_code)
+VALUES (1, '2022-01-01', 1000.00, NOW(), NOW(), 1, 1, 0, 'USD'),
+       (2, '2022-02-15', 2500.00, NOW(), NOW(), 1, 1, 0, 'EUR'),
+       (3, '2022-03-20', 5000.00, NOW(), NOW(), 2, 1, 0, 'USD'),
+       (2, '2022-04-10', 1500.00, NOW(), NOW(), 3, 1, 0, 'GBP'),
+       (1, '2022-05-05', 800.00, NOW(), NOW(), 2, 1, 0, 'USD');
+       
+       
+ 
+
+CREATE TABLE purchase_order_items (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  purchase_order_id INT(11) NOT NULL,
+  product_id INT(11) NOT NULL,
+  purchase_price DECIMAL(10,2) NOT NULL,
+  quantity INT(11) NOT NULL,
+  currency_code VARCHAR(3) NOT NULL DEFAULT 'USD',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BIGINT(20) DEFAULT NULL,
+  updated_by BIGINT(20) DEFAULT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+
+
+INSERT INTO purchase_order_items (purchase_order_id, product_id, purchase_price, quantity, currency_code)
+VALUES (1, 4, 10.50, 5, 'USD'),
+       (1, 4, 15.00, 10, 'USD');
+       
+       
+ ALTER TABLE vendors MODIFY COLUMN is_deleted TINYINT(1) DEFAULT 0;
+       
