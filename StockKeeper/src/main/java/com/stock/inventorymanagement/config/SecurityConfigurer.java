@@ -20,7 +20,6 @@ import com.stock.inventorymanagement.service.impl.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-@Import(CorsConfig.class)
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
@@ -52,7 +51,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().
-               authorizeRequests().antMatchers(HttpMethod.OPTIONS,"/api/v1/auth/login").permitAll().
+               authorizeRequests().antMatchers("/api/v1/auth/login").permitAll().
                         anyRequest().authenticated().and().
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
