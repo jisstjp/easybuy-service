@@ -1,7 +1,4 @@
 package com.stock.inventorymanagement.dto;
-
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.stock.inventorymanagement.enums.PriceType;
 
@@ -14,7 +11,9 @@ public class PriceDto {
 
     private PriceType priceType;
 
-    private BigDecimal price;
+    private double price;
+
+    private String currency;
 
     private Long createdBy;
 
@@ -46,12 +45,20 @@ public class PriceDto {
 	this.priceType = priceType;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
 	return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
 	this.price = price;
+    }
+
+    public String getCurrency() {
+	return currency;
+    }
+
+    public void setCurrency(String currency) {
+	this.currency = currency;
     }
 
     public Long getCreatedBy() {

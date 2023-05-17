@@ -19,8 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.stock.inventorymanagement.util.JwtTokenUtil;
 
-import io.jsonwebtoken.ExpiredJwtException;
-
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 

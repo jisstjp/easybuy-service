@@ -33,7 +33,7 @@ public class Price {
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "currency")
+    @Column(name = "currency_code")
     private String currency;
 
     @Column(name = "created_by")
@@ -82,7 +82,8 @@ public class Price {
     }
 
     public void setCurrency(String currency) {
-	this.currency = currency;
+        this.currency = (currency != null && !currency.isEmpty()) ? currency : "USD";
+
     }
 
     public Long getCreatedBy() {

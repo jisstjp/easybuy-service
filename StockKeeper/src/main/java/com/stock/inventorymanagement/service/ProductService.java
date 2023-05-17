@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.stock.inventorymanagement.dto.ProductDto;
 
@@ -10,7 +11,7 @@ public interface ProductService {
 
     ProductDto getProductById(Long id);
 
-    List<ProductDto> getAllProducts();
+    Page<ProductDto> getAllProducts(Pageable pageable);
 
     ProductDto updateProduct(Long id, ProductDto productDto, Long userId);
 

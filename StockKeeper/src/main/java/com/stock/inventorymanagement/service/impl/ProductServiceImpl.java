@@ -1,5 +1,6 @@
 package com.stock.inventorymanagement.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,65 +88,24 @@ public class ProductServiceImpl implements ProductService {
 	    product.setSubcategory(subcategory);
 	}
 
-	Product savedProduct = productRepository.saveAndFlush(product);
+	Product savedProduct = productRepository.save(product);
 
-	// Save prices
-//	List<PriceDto> priceDtos = productDto.getPrices();
-//	if (priceDtos != null && !priceDtos.isEmpty()) {
-//	    for (PriceDto priceDto : priceDtos) {
-//		PriceType priceType = priceDto.getPriceType();
-//		if (priceType == null || !PriceType.isValid(priceType.getType())) {
-//		    throw new InvalidPriceTypeException("Invalid price type: " + priceDto.getPriceType());
-//		}
-//		Price price = priceMapper.toEntity(priceDto);
-//		price.setProduct(savedProduct);
-//		price.setCreatedBy(userId);
-//
-//		if (price.getId() != null) {
-//		    price = entityManager.merge(price);
-//		} else {
-//		    entityManager.persist(price);
-//		}
-//	    }
-//	}
-
-//	List<PriceDto> priceDtos = productDto.getPrices();
-//	if (priceDtos != null && !priceDtos.isEmpty()) {
-//	    List<Price> newPrices = priceDtos.stream().filter(priceDto -> {
-//		PriceType priceType = priceDto.getPriceType();
-//		return priceType != null && PriceType.isValid(priceType.getType());
-//	    }).map(priceMapper::toEntity).peek(price -> {
-//		price.setProduct(savedProduct);
-//		price.setCreatedBy(userId);
-//	    }).collect(Collectors.toList());
-//
-//	    newPrices.forEach(entityManager::persist);
-//	    
-//	}
-	
-	
-	// Save prices
-	    List<PriceDto> priceDtos = productDto.getPrices();
-	    if (priceDtos != null && !priceDtos.isEmpty()) {
-	        for (PriceDto priceDto : priceDtos) {
-	            PriceType priceType = priceDto.getPriceType();
-	            if (priceType == null || !PriceType.isValid(priceType.getType())) {
-	                throw new InvalidPriceTypeException("Invalid price type: " + priceDto.getPriceType());
-	            }
-	            Price price = priceMapper.toEntity(priceDto);
-	            price.setProduct(savedProduct);
-	            price.setCreatedBy(userId);
-
-	            // Save the price
-	            price = priceRepository.save(price);
-
-	            // Set the price ID in the DTO
-	            priceDto.setId(price.getId());
-
-	            // Set the product ID in the DTO
-	            priceDto.setProductId(savedProduct.getId());
-	        }
-	    }
+	final List<PriceDto> priceDtos = productDto.getPrices();
+	if (priceDtos != null && !priceDtos.isEmpty()) {
+	    List<Price> prices = priceDtos.stream().peek(priceDto -> {
+		PriceType priceType = priceDto.getPriceType();
+		if (priceType == null || !PriceType.isValid(priceType.getType())) {
+		    throw new InvalidPriceTypeException("Invalid price type: " + priceDto.getPriceType());
+		}
+	    }).map(priceDto -> {
+		Price price = priceMapper.toEntity(priceDto);
+		price.setProduct(savedProduct);
+		price.setCreatedBy(userId);
+		return price;
+	    }).collect(Collectors.toList());
+	    priceRepository.saveAll(prices);
+	    savedProduct.setPrices(prices);
+	}
 
 	// Map and return DTO
 	return productMapper.toDto(savedProduct);
@@ -151,13 +114,28 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public ProductDto updateProduct(Long id, ProductDto productDto, Long userId) {
+	// Check if the product exists
 	Product existingProduct = productRepository.findById(id)
 		.orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
 	// Update the existing product with the new data
 	existingProduct.setName(productDto.getName());
 	existingProduct.setDescription(productDto.getDescription());
-	// Update other properties as needed
+	existingProduct.setSku(productDto.getSku());
+	existingProduct.setUpc(productDto.getUpc());
+	existingProduct.setPrice(productDto.getPrice());
+	existingProduct.setQuantity(productDto.getQuantity());
+	existingProduct.setQuantityInBox(productDto.getQuantityInBox());
+	existingProduct.setWeight(productDto.getWeight());
+	existingProduct.setManufacturer(productDto.getManufacturer());
+	existingProduct.setLength(productDto.getLength());
+	existingProduct.setWidth(productDto.getWidth());
+	existingProduct.setHeight(productDto.getHeight());
+	existingProduct.setImageUrl(productDto.getImageUrl());
+	existingProduct.setIsAvailable(productDto.getIsAvailable());
+	// Update other fields as needed
+
+	existingProduct.setUpdatedBy(userId);
 
 	// Set brand
 	BrandDto brandDto = productDto.getBrand();
@@ -184,10 +162,51 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	// Save the updated product
-	Product updatedProduct = productRepository.save(existingProduct);
+	List<Price> existingPrices = existingProduct.getPrices();
 
-	// Map and return the updated DTO
-	return productMapper.toDto(updatedProduct);
+	Product savedProduct = productRepository.save(existingProduct);
+
+	// Update existing prices
+	List<PriceDto> updatedPriceDtos = productDto.getPrices();
+	if (updatedPriceDtos != null && !updatedPriceDtos.isEmpty()) {
+	    List<Price> updatedPrices = new ArrayList<>();
+	    for (PriceDto updatedPriceDto : updatedPriceDtos) {
+		Long updatedPriceId = updatedPriceDto.getId();
+		if (updatedPriceId != null) {
+		    // Find the corresponding existing price by ID
+		    Price existingPrice = existingPrices.stream().filter(price -> price.getId().equals(updatedPriceId))
+			    .findFirst()
+			    .orElseThrow(() -> new ResourceNotFoundException("Price", "id", updatedPriceId));
+
+		    // Update the properties of the existing price
+		    existingPrice.setPriceType(updatedPriceDto.getPriceType());
+		    existingPrice.setPrice(updatedPriceDto.getPrice());
+		    existingPrice.setCurrency(updatedPriceDto.getCurrency());
+		    // Update other price properties as needed
+
+		    updatedPrices.add(existingPrice);
+		} else {
+		    // New price, create a new Price object and add it to the updated prices
+		    Price newPrice = priceMapper.toEntity(updatedPriceDto);
+		    newPrice.setProduct(savedProduct);
+		    newPrice.setCreatedBy(userId);
+		    // Set other price properties as needed
+
+		    updatedPrices.add(newPrice);
+		}
+	    }
+
+	    // Save the updated prices
+	    priceRepository.saveAll(updatedPrices);
+
+	    // Update the existing prices list with the updated prices
+	    existingPrices.clear();
+	    existingPrices.addAll(updatedPrices);
+	}
+
+	// Map and return the updated product DTO
+	return productMapper.toDto(savedProduct);
+
     }
 
     @Override
@@ -201,10 +220,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-
-    public List<ProductDto> getAllProducts() {
-	List<Product> products = productRepository.findAll();
-	return products.stream().map(productMapper::toDto).collect(Collectors.toList());
+    public Page<ProductDto> getAllProducts(Pageable pageable) {
+	Page<Product> productsPage = productRepository.findAll(pageable);
+	List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
+	return new PageImpl<>(productDtos, pageable, productsPage.getTotalElements());
     }
 
 }
