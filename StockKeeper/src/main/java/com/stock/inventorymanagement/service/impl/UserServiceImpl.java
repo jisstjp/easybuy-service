@@ -10,10 +10,11 @@ import com.stock.inventorymanagement.dto.UserDto;
 import com.stock.inventorymanagement.mapper.UserMapper;
 import com.stock.inventorymanagement.repository.UserRepository;
 import com.stock.inventorymanagement.service.UserService;
+
 @Service
 public class UserServiceImpl implements UserService {
-	
-	@Autowired
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -21,9 +22,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByUsername(String username) {
-    	Optional<User> optionalUser = userRepository.findByUsername(username);
-    	User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        return userMapper.toDto(user);
+	Optional<User> optionalUser = userRepository.findByUsername(username);
+	User user = optionalUser
+		.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+	return userMapper.toDto(user);
     }
 
 }

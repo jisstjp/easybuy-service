@@ -9,5 +9,5 @@ import com.stock.inventorymanagement.domain.Subcategory;
 
 @Repository
 public interface SubcategoryRepository extends JpaRepository<Subcategory, Long> {
-	List<Subcategory> findByCategoryId(Long categoryId);
+    List<Subcategory> findByCategoryId(Long categoryId);
 }

@@ -5,14 +5,14 @@ import com.stock.inventorymanagement.dto.BrandDto;
 
 public interface BrandService {
 
-	List<BrandDto> getAllBrands();
+    List<BrandDto> getAllBrands();
 
-	BrandDto getBrandById(Long id);
+    BrandDto getBrandById(Long id);
 
-	BrandDto createBrand(BrandDto brandDto,Long userId);
+    BrandDto createBrand(BrandDto brandDto, Long userId);
 
-	BrandDto updateBrand(Long id, BrandDto brandDto,Long userId);
+    BrandDto updateBrand(Long id, BrandDto brandDto, Long userId);
 
-	void deleteBrand(Long id,Long userId);
+    void deleteBrand(Long id, Long userId);
 
 }

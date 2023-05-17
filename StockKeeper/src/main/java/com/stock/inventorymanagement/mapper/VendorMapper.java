@@ -9,15 +9,15 @@ import com.stock.inventorymanagement.dto.VendorDto;
 @Component
 public class VendorMapper {
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	public Vendor toEntity(VendorDto vendorDto) {
-		return modelMapper.map(vendorDto, Vendor.class);
-	}
+    public Vendor toEntity(VendorDto vendorDto) {
+	return modelMapper.map(vendorDto, Vendor.class);
+    }
 
-	public VendorDto toDto(Vendor vendor) {
-		return modelMapper.map(vendor, VendorDto.class);
-	}
+    public VendorDto toDto(Vendor vendor) {
+	return modelMapper.map(vendor, VendorDto.class);
+    }
 
 }

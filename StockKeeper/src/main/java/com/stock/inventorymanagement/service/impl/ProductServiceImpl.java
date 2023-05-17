@@ -35,58 +35,93 @@ import com.stock.inventorymanagement.service.ProductService;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-	@Autowired
-	private ProductRepository productRepository;
-	@Autowired
-	private BrandRepository brandRepository;
-	@Autowired
-	private CategoryRepository categoryRepository;
-	@Autowired
-	private SubcategoryRepository subcategoryRepository;
-	@Autowired
-	private ProductMapper productMapper;
-	@Autowired
-	private PriceMapper priceMapper;
-	@Autowired
-	private PriceRepository priceRepository;
-	
-	@PersistenceContext
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private BrandRepository brandRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private SubcategoryRepository subcategoryRepository;
+    @Autowired
+    private ProductMapper productMapper;
+    @Autowired
+    private PriceMapper priceMapper;
+    @Autowired
+    private PriceRepository priceRepository;
+
+    @PersistenceContext
     private EntityManager entityManager;
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public ProductDto createProduct(ProductDto productDto, Long userId) {
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public ProductDto createProduct(ProductDto productDto, Long userId) {
 
-		final Product product = productMapper.toEntity(productDto);
-		product.setCreatedBy(userId);
+	final Product product = productMapper.toEntity(productDto);
+	product.setCreatedBy(userId);
 
-		// Set brand
-		BrandDto brandDto = productDto.getBrand();
-		if (brandDto != null && brandDto.getId() != null) {
-			Brand brand = brandRepository.findById(brandDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandDto.getId()));
-			product.setBrand(brand);
-		}
+	// Set brand
+	BrandDto brandDto = productDto.getBrand();
+	if (brandDto != null && brandDto.getId() != null) {
+	    Brand brand = brandRepository.findById(brandDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandDto.getId()));
+	    product.setBrand(brand);
+	}
 
-		// Set category
-		CategoryDto categoryDto = productDto.getCategory();
-		if (categoryDto != null && categoryDto.getId() != null) {
-			Category category = categoryRepository.findById(categoryDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryDto.getId()));
-			product.setCategory(category);
-		}
+	// Set category
+	CategoryDto categoryDto = productDto.getCategory();
+	if (categoryDto != null && categoryDto.getId() != null) {
+	    Category category = categoryRepository.findById(categoryDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryDto.getId()));
+	    product.setCategory(category);
+	}
 
-		// Set subcategory
-		SubcategoryDto subcategoryDto = productDto.getSubcategory();
-		if (subcategoryDto != null && subcategoryDto.getId() != null) {
-			Subcategory subcategory = subcategoryRepository.findById(subcategoryDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
-			product.setSubcategory(subcategory);
-		}
+	// Set subcategory
+	SubcategoryDto subcategoryDto = productDto.getSubcategory();
+	if (subcategoryDto != null && subcategoryDto.getId() != null) {
+	    Subcategory subcategory = subcategoryRepository.findById(subcategoryDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
+	    product.setSubcategory(subcategory);
+	}
 
-		Product savedProduct = productRepository.save(product);
+	Product savedProduct = productRepository.saveAndFlush(product);
 
-		 // Save prices
+	// Save prices
+//	List<PriceDto> priceDtos = productDto.getPrices();
+//	if (priceDtos != null && !priceDtos.isEmpty()) {
+//	    for (PriceDto priceDto : priceDtos) {
+//		PriceType priceType = priceDto.getPriceType();
+//		if (priceType == null || !PriceType.isValid(priceType.getType())) {
+//		    throw new InvalidPriceTypeException("Invalid price type: " + priceDto.getPriceType());
+//		}
+//		Price price = priceMapper.toEntity(priceDto);
+//		price.setProduct(savedProduct);
+//		price.setCreatedBy(userId);
+//
+//		if (price.getId() != null) {
+//		    price = entityManager.merge(price);
+//		} else {
+//		    entityManager.persist(price);
+//		}
+//	    }
+//	}
+
+//	List<PriceDto> priceDtos = productDto.getPrices();
+//	if (priceDtos != null && !priceDtos.isEmpty()) {
+//	    List<Price> newPrices = priceDtos.stream().filter(priceDto -> {
+//		PriceType priceType = priceDto.getPriceType();
+//		return priceType != null && PriceType.isValid(priceType.getType());
+//	    }).map(priceMapper::toEntity).peek(price -> {
+//		price.setProduct(savedProduct);
+//		price.setCreatedBy(userId);
+//	    }).collect(Collectors.toList());
+//
+//	    newPrices.forEach(entityManager::persist);
+//	    
+//	}
+	
+	
+	// Save prices
 	    List<PriceDto> priceDtos = productDto.getPrices();
 	    if (priceDtos != null && !priceDtos.isEmpty()) {
 	        for (PriceDto priceDto : priceDtos) {
@@ -98,75 +133,78 @@ public class ProductServiceImpl implements ProductService {
 	            price.setProduct(savedProduct);
 	            price.setCreatedBy(userId);
 
-	            if (price.getId() != null) {
-	                price = entityManager.merge(price);
-	            } else {
-	                entityManager.persist(price);
-	            }
+	            // Save the price
+	            price = priceRepository.save(price);
+
+	            // Set the price ID in the DTO
+	            priceDto.setId(price.getId());
+
+	            // Set the product ID in the DTO
+	            priceDto.setProductId(savedProduct.getId());
 	        }
 	    }
 
-		// Map and return DTO
-		return productMapper.toDto(product);
+	// Map and return DTO
+	return productMapper.toDto(savedProduct);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public ProductDto updateProduct(Long id, ProductDto productDto, Long userId) {
+	Product existingProduct = productRepository.findById(id)
+		.orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+	// Update the existing product with the new data
+	existingProduct.setName(productDto.getName());
+	existingProduct.setDescription(productDto.getDescription());
+	// Update other properties as needed
+
+	// Set brand
+	BrandDto brandDto = productDto.getBrand();
+	if (brandDto != null && brandDto.getId() != null) {
+	    Brand brand = brandRepository.findById(brandDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandDto.getId()));
+	    existingProduct.setBrand(brand);
 	}
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public ProductDto updateProduct(Long id, ProductDto productDto, Long userId) {
-		Product existingProduct = productRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-
-		// Update the existing product with the new data
-		existingProduct.setName(productDto.getName());
-		existingProduct.setDescription(productDto.getDescription());
-		// Update other properties as needed
-
-		// Set brand
-		BrandDto brandDto = productDto.getBrand();
-		if (brandDto != null && brandDto.getId() != null) {
-			Brand brand = brandRepository.findById(brandDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Brand", "id", brandDto.getId()));
-			existingProduct.setBrand(brand);
-		}
-
-		// Set category
-		CategoryDto categoryDto = productDto.getCategory();
-		if (categoryDto != null && categoryDto.getId() != null) {
-			Category category = categoryRepository.findById(categoryDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryDto.getId()));
-			existingProduct.setCategory(category);
-		}
-
-		// Set subcategory
-		SubcategoryDto subcategoryDto = productDto.getSubcategory();
-		if (subcategoryDto != null && subcategoryDto.getId() != null) {
-			Subcategory subcategory = subcategoryRepository.findById(subcategoryDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
-			existingProduct.setSubcategory(subcategory);
-		}
-
-		// Save the updated product
-		Product updatedProduct = productRepository.save(existingProduct);
-
-		// Map and return the updated DTO
-		return productMapper.toDto(updatedProduct);
+	// Set category
+	CategoryDto categoryDto = productDto.getCategory();
+	if (categoryDto != null && categoryDto.getId() != null) {
+	    Category category = categoryRepository.findById(categoryDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryDto.getId()));
+	    existingProduct.setCategory(category);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public ProductDto getProductById(Long id) {
-		Product product = productRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-
-		return productMapper.toDto(product);
+	// Set subcategory
+	SubcategoryDto subcategoryDto = productDto.getSubcategory();
+	if (subcategoryDto != null && subcategoryDto.getId() != null) {
+	    Subcategory subcategory = subcategoryRepository.findById(subcategoryDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
+	    existingProduct.setSubcategory(subcategory);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
+	// Save the updated product
+	Product updatedProduct = productRepository.save(existingProduct);
 
-	public List<ProductDto> getAllProducts() {
-		List<Product> products = productRepository.findAll();
-		return products.stream().map(productMapper::toDto).collect(Collectors.toList());
-	}
+	// Map and return the updated DTO
+	return productMapper.toDto(updatedProduct);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductDto getProductById(Long id) {
+	Product product = productRepository.findById(id)
+		.orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+	return productMapper.toDto(product);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+
+    public List<ProductDto> getAllProducts() {
+	List<Product> products = productRepository.findAll();
+	return products.stream().map(productMapper::toDto).collect(Collectors.toList());
+    }
 
 }

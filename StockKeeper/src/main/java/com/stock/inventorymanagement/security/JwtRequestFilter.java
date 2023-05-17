@@ -24,43 +24,43 @@ import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+	    throws ServletException, IOException {
 
-		try {
-			String jwt = parseJwt(request);
-			if (jwt != null && jwtTokenUtil.validateJwtToken(jwt)) {
-				String username = jwtTokenUtil.getUsernameFromToken(jwt);
+	try {
+	    String jwt = parseJwt(request);
+	    if (jwt != null && jwtTokenUtil.validateJwtToken(jwt)) {
+		String username = jwtTokenUtil.getUsernameFromToken(jwt);
 
-				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+			userDetails, null, userDetails.getAuthorities());
+		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
-		} catch (Exception e) {
-			logger.error("Cannot set user authentication: {}", e);
-		}
-
-		chain.doFilter(request, response);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	    }
+	} catch (Exception e) {
+	    logger.error("Cannot set user authentication: {}", e);
 	}
 
-	private String parseJwt(HttpServletRequest request) {
-		String headerAuth = request.getHeader("Authorization");
+	chain.doFilter(request, response);
+    }
 
-		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-			return headerAuth.substring(7, headerAuth.length());
-		}
+    private String parseJwt(HttpServletRequest request) {
+	String headerAuth = request.getHeader("Authorization");
 
-		return null;
+	if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+	    return headerAuth.substring(7, headerAuth.length());
 	}
+
+	return null;
+    }
 
 }

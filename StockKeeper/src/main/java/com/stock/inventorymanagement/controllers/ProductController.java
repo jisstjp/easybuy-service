@@ -18,22 +18,22 @@ import com.stock.inventorymanagement.service.ProductService;
 
 @RestController
 @RequestMapping("/api/v1/products")
-public class ProductController extends BaseController{
-	
-	 @Autowired
-     private  ProductService productService;
-	 
-	 @GetMapping
-	    public ResponseEntity<List<ProductDto>> getAllProducts() {
-	        List<ProductDto> products = productService.getAllProducts();
-	        return ResponseEntity.ok(products);
-	    }
+public class ProductController extends BaseController {
 
-	    @PostMapping
-	    public ResponseEntity<ProductDto> createProduct(HttpServletRequest request,@RequestBody ProductDto productDto) {
-	     	 Long userId = getUserIdFromToken(request);
-	        ProductDto createdProduct = productService.createProduct(productDto,userId);
-	        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
-	    }
+    @Autowired
+    private ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+	List<ProductDto> products = productService.getAllProducts();
+	return ResponseEntity.ok(products);
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductDto> createProduct(HttpServletRequest request, @RequestBody ProductDto productDto) {
+	Long userId = getUserIdFromToken(request);
+	ProductDto createdProduct = productService.createProduct(productDto, userId);
+	return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    }
 
 }

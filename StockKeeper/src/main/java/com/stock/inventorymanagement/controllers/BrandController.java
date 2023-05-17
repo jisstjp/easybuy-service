@@ -19,38 +19,38 @@ import com.stock.inventorymanagement.service.BrandService;
 
 @RestController
 @RequestMapping("/api/v1/brands")
-public class BrandController  extends BaseController{
+public class BrandController extends BaseController {
 
     @Autowired
     private BrandService brandService;
 
     @GetMapping
     public List<BrandDto> getAllBrands() {
-        return brandService.getAllBrands();
+	return brandService.getAllBrands();
     }
 
     @GetMapping("/{id}")
     public BrandDto getBrandById(@PathVariable Long id) {
-        return brandService.getBrandById(id);
+	return brandService.getBrandById(id);
     }
 
     @PostMapping
-    public BrandDto createBrand(HttpServletRequest request ,@RequestBody BrandDto brandDto) {
-        Long userId = getUserIdFromToken(request);
-        return brandService.createBrand(brandDto,userId);
+    public BrandDto createBrand(HttpServletRequest request, @RequestBody BrandDto brandDto) {
+	Long userId = getUserIdFromToken(request);
+	return brandService.createBrand(brandDto, userId);
     }
 
     @PutMapping("/{id}")
-    public BrandDto updateBrand(HttpServletRequest request,@PathVariable Long id, @RequestBody BrandDto brandDto) {
-        Long userId = getUserIdFromToken(request);
-        return brandService.updateBrand(id, brandDto,userId);
+    public BrandDto updateBrand(HttpServletRequest request, @PathVariable Long id, @RequestBody BrandDto brandDto) {
+	Long userId = getUserIdFromToken(request);
+	return brandService.updateBrand(id, brandDto, userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBrand(HttpServletRequest request,@PathVariable Long id) {
-        Long userId = getUserIdFromToken(request);
-        brandService.deleteBrand(id,userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteBrand(HttpServletRequest request, @PathVariable Long id) {
+	Long userId = getUserIdFromToken(request);
+	brandService.deleteBrand(id, userId);
+	return ResponseEntity.ok().build();
     }
 
 }

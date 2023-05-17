@@ -9,17 +9,16 @@ import com.stock.inventorymanagement.dto.SubcategoryDto;
 
 @Component
 public class SubcategoryMapper {
-	
-	@Autowired
-	private ModelMapper modelMapper;
-	
-	public SubcategoryDto toDto(Subcategory subcategory) {
-        return modelMapper.map(subcategory, SubcategoryDto.class);
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public SubcategoryDto toDto(Subcategory subcategory) {
+	return modelMapper.map(subcategory, SubcategoryDto.class);
     }
 
     public Subcategory toEntity(SubcategoryDto subcategoryDto) {
-        return modelMapper.map(subcategoryDto, Subcategory.class);
+	return modelMapper.map(subcategoryDto, Subcategory.class);
     }
-	
 
 }

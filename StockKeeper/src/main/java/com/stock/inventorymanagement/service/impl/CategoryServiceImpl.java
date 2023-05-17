@@ -14,9 +14,9 @@ import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.mapper.CategoryMapper;
 import com.stock.inventorymanagement.repository.CategoryRepository;
 import com.stock.inventorymanagement.service.CategoryService;
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
-	
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -25,53 +25,50 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryMapper categoryMapper;
 
     @Override
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<CategoryDto> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categories.stream()
-                .map(categoryMapper::toDto)
-                .collect(Collectors.toList());
+	List<Category> categories = categoryRepository.findAll();
+	return categories.stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public CategoryDto getCategoryById(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
-        return categoryMapper.toDto(category);
+	Category category = categoryRepository.findById(id)
+		.orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+	return categoryMapper.toDto(category);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public CategoryDto createCategory(CategoryDto categoryDto,Long userId) {
-        Category category = categoryMapper.toEntity(categoryDto);
-        category.setCreatedBy(userId);
-        category = categoryRepository.save(category);
-        return categoryMapper.toDto(category);
+    public CategoryDto createCategory(CategoryDto categoryDto, Long userId) {
+	Category category = categoryMapper.toEntity(categoryDto);
+	category.setCreatedBy(userId);
+	category = categoryRepository.save(category);
+	return categoryMapper.toDto(category);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public CategoryDto updateCategory(Long id, CategoryDto categoryDto,Long userId) {
-        Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
-        existingCategory.setName(categoryDto.getName());
-        existingCategory.setDescription(categoryDto.getDescription());
-        existingCategory.setUpdatedBy(userId);
+    public CategoryDto updateCategory(Long id, CategoryDto categoryDto, Long userId) {
+	Category existingCategory = categoryRepository.findById(id)
+		.orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+	existingCategory.setName(categoryDto.getName());
+	existingCategory.setDescription(categoryDto.getDescription());
+	existingCategory.setUpdatedBy(userId);
 
-        Category updatedCategory = categoryRepository.save(existingCategory);
-        return categoryMapper.toDto(updatedCategory);
+	Category updatedCategory = categoryRepository.save(existingCategory);
+	return categoryMapper.toDto(updatedCategory);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteCategory(Long id,Long userId) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
-       category.setDeleted(true);
-       category.setUpdatedBy(userId);
-       categoryRepository.save(category);
+    public void deleteCategory(Long id, Long userId) {
+	Category category = categoryRepository.findById(id)
+		.orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+	category.setDeleted(true);
+	category.setUpdatedBy(userId);
+	categoryRepository.save(category);
     }
-
 
 }

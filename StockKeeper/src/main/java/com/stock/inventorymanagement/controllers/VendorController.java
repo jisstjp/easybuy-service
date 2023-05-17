@@ -21,42 +21,43 @@ import com.stock.inventorymanagement.service.VendorService;
 
 @RestController
 @RequestMapping("/api/v1/vendors")
-public class VendorController extends BaseController{
+public class VendorController extends BaseController {
 
-	@Autowired
-	private VendorService vendorService;
+    @Autowired
+    private VendorService vendorService;
 
-	@PostMapping
-	public ResponseEntity<VendorDto> createVendor(HttpServletRequest request,@RequestBody VendorDto vendorDto) {
-	 	 Long userId = getUserIdFromToken(request);
-		VendorDto createdVendorDto = vendorService.createVendor(vendorDto,userId);
-		return new ResponseEntity<>(createdVendorDto, HttpStatus.CREATED);
-	}
+    @PostMapping
+    public ResponseEntity<VendorDto> createVendor(HttpServletRequest request, @RequestBody VendorDto vendorDto) {
+	Long userId = getUserIdFromToken(request);
+	VendorDto createdVendorDto = vendorService.createVendor(vendorDto, userId);
+	return new ResponseEntity<>(createdVendorDto, HttpStatus.CREATED);
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<VendorDto> getVendorById(@PathVariable Long id) {
-		VendorDto vendorDto = vendorService.getVendorById(id);
-		return new ResponseEntity<>(vendorDto, HttpStatus.OK);
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<VendorDto> getVendorById(@PathVariable Long id) {
+	VendorDto vendorDto = vendorService.getVendorById(id);
+	return new ResponseEntity<>(vendorDto, HttpStatus.OK);
+    }
 
-	@GetMapping
-	public ResponseEntity<List<VendorDto>> getAllVendors() {
-		List<VendorDto> vendorDtos = vendorService.getAllVendors();
-		return new ResponseEntity<>(vendorDtos, HttpStatus.OK);
-	}
+    @GetMapping
+    public ResponseEntity<List<VendorDto>> getAllVendors() {
+	List<VendorDto> vendorDtos = vendorService.getAllVendors();
+	return new ResponseEntity<>(vendorDtos, HttpStatus.OK);
+    }
 
-	@PutMapping("/{id}")
-	public ResponseEntity<VendorDto> updateVendor(HttpServletRequest request,@PathVariable Long id, @RequestBody VendorDto vendorDto) {
-	 	 Long userId = getUserIdFromToken(request);
-		VendorDto updatedVendorDto = vendorService.updateVendor(id, vendorDto,userId);
-		return new ResponseEntity<>(updatedVendorDto, HttpStatus.OK);
-	}
+    @PutMapping("/{id}")
+    public ResponseEntity<VendorDto> updateVendor(HttpServletRequest request, @PathVariable Long id,
+	    @RequestBody VendorDto vendorDto) {
+	Long userId = getUserIdFromToken(request);
+	VendorDto updatedVendorDto = vendorService.updateVendor(id, vendorDto, userId);
+	return new ResponseEntity<>(updatedVendorDto, HttpStatus.OK);
+    }
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteVendor(HttpServletRequest request,@PathVariable Long id) {
-	 	 Long userId = getUserIdFromToken(request);
-		vendorService.deleteVendor(id,userId);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVendor(HttpServletRequest request, @PathVariable Long id) {
+	Long userId = getUserIdFromToken(request);
+	vendorService.deleteVendor(id, userId);
+	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }

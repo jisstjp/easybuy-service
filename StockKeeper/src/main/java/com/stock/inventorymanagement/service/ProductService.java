@@ -6,14 +6,14 @@ import com.stock.inventorymanagement.dto.ProductDto;
 
 public interface ProductService {
 
-	ProductDto createProduct(ProductDto productDto, Long userId);
+    ProductDto createProduct(ProductDto productDto, Long userId);
 
     ProductDto getProductById(Long id);
 
-	List<ProductDto> getAllProducts();
+    List<ProductDto> getAllProducts();
 
-	ProductDto updateProduct(Long id, ProductDto productDto, Long userId);
+    ProductDto updateProduct(Long id, ProductDto productDto, Long userId);
 
-	// void deleteProduct(Long id);
+    // void deleteProduct(Long id);
 
 }

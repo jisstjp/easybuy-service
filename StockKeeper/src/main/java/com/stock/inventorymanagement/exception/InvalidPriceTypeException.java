@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidPriceTypeException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public InvalidPriceTypeException(String message) {
-		super(message);
-	}
+    public InvalidPriceTypeException(String message) {
+	super(message);
+    }
 
 }

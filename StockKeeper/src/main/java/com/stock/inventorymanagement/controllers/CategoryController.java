@@ -28,31 +28,33 @@ public class CategoryController extends BaseController {
 
     @GetMapping
     public List<CategoryDto> getAllCategories() {
-        return categoryService.getAllCategories();
+	return categoryService.getAllCategories();
     }
 
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+	return categoryService.getCategoryById(id);
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(HttpServletRequest request,@RequestBody CategoryDto categoryDto) {
-    	 Long userId = getUserIdFromToken(request);
-        CategoryDto createdCategory = categoryService.createCategory(categoryDto,userId);
-        return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
+    public ResponseEntity<CategoryDto> createCategory(HttpServletRequest request,
+	    @RequestBody CategoryDto categoryDto) {
+	Long userId = getUserIdFromToken(request);
+	CategoryDto createdCategory = categoryService.createCategory(categoryDto, userId);
+	return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public CategoryDto updateCategory(HttpServletRequest request,@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
-    	Long userId = getUserIdFromToken(request);
-        return categoryService.updateCategory(id, categoryDto,userId);
+    public CategoryDto updateCategory(HttpServletRequest request, @PathVariable Long id,
+	    @RequestBody CategoryDto categoryDto) {
+	Long userId = getUserIdFromToken(request);
+	return categoryService.updateCategory(id, categoryDto, userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategory(HttpServletRequest request,@PathVariable Long id) {
-    	Long userId = getUserIdFromToken(request);
-        categoryService.deleteCategory(id,userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteCategory(HttpServletRequest request, @PathVariable Long id) {
+	Long userId = getUserIdFromToken(request);
+	categoryService.deleteCategory(id, userId);
+	return ResponseEntity.ok().build();
     }
 }

@@ -9,15 +9,15 @@ import com.stock.inventorymanagement.dto.CategoryDto;
 
 @Component
 public class CategoryMapper {
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	public CategoryDto toDto(Category category) {
-		return modelMapper.map(category, CategoryDto.class);
-	}
+    public CategoryDto toDto(Category category) {
+	return modelMapper.map(category, CategoryDto.class);
+    }
 
-	public Category toEntity(CategoryDto categoryDto) {
-		return modelMapper.map(categoryDto, Category.class);
-	}
+    public Category toEntity(CategoryDto categoryDto) {
+	return modelMapper.map(categoryDto, Category.class);
+    }
 
 }

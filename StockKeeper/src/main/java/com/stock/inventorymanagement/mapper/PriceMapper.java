@@ -9,16 +9,17 @@ import com.stock.inventorymanagement.dto.PriceDto;
 
 @Component
 public class PriceMapper {
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public PriceDto toDto(Price price) {
+	return modelMapper.map(price, PriceDto.class);
 	
-	@Autowired
-	private ModelMapper modelMapper;
-	
-	public PriceDto toDto(Price price) {
-        return modelMapper.map(price, PriceDto.class);
     }
 
     public Price toEntity(PriceDto priceDto) {
-        return modelMapper.map(priceDto, Price.class);
+	return modelMapper.map(priceDto, Price.class);
     }
 
 }

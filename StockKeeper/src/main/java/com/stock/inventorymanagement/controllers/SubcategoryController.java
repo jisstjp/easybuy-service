@@ -21,39 +21,41 @@ import com.stock.inventorymanagement.service.SubcategoryService;
 
 @RestController
 @RequestMapping("/api/v1/subcategories")
-public class SubcategoryController extends BaseController{
-	
-	@Autowired
+public class SubcategoryController extends BaseController {
+
+    @Autowired
     private SubcategoryService subcategoryService;
 
     @GetMapping
     public List<SubcategoryDto> getAllSubcategories() {
-        return subcategoryService.getAllSubcategories();
+	return subcategoryService.getAllSubcategories();
     }
 
     @GetMapping("/{id}")
     public SubcategoryDto getSubcategoryById(@PathVariable Long id) {
-        return subcategoryService.getSubcategoryById(id);
+	return subcategoryService.getSubcategoryById(id);
     }
 
     @PostMapping
-    public ResponseEntity<SubcategoryDto> createSubcategory(HttpServletRequest request,@RequestBody SubcategoryDto subcategoryDto) {
-    	 Long userId = getUserIdFromToken(request);
-        SubcategoryDto createdSubcategory = subcategoryService.createSubcategory(subcategoryDto,userId);
-        return new ResponseEntity<>(createdSubcategory, HttpStatus.CREATED);
+    public ResponseEntity<SubcategoryDto> createSubcategory(HttpServletRequest request,
+	    @RequestBody SubcategoryDto subcategoryDto) {
+	Long userId = getUserIdFromToken(request);
+	SubcategoryDto createdSubcategory = subcategoryService.createSubcategory(subcategoryDto, userId);
+	return new ResponseEntity<>(createdSubcategory, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public SubcategoryDto updateSubcategory(HttpServletRequest request,@PathVariable Long id, @RequestBody SubcategoryDto subcategoryDto) {
-   	 Long userId = getUserIdFromToken(request);
-     return subcategoryService.updateSubcategory(id, subcategoryDto,userId);
+    public SubcategoryDto updateSubcategory(HttpServletRequest request, @PathVariable Long id,
+	    @RequestBody SubcategoryDto subcategoryDto) {
+	Long userId = getUserIdFromToken(request);
+	return subcategoryService.updateSubcategory(id, subcategoryDto, userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSubcategory(HttpServletRequest request,@PathVariable Long id) {
-      	 Long userId = getUserIdFromToken(request);
-      	 subcategoryService.deleteSubcategory(id,userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteSubcategory(HttpServletRequest request, @PathVariable Long id) {
+	Long userId = getUserIdFromToken(request);
+	subcategoryService.deleteSubcategory(id, userId);
+	return ResponseEntity.ok().build();
     }
 
 }

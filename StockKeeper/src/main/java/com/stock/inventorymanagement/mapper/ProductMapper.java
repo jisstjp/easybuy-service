@@ -10,15 +10,15 @@ import com.stock.inventorymanagement.dto.ProductDto;
 @Component
 public class ProductMapper {
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	public Product toEntity(ProductDto productDto) {
-		return modelMapper.map(productDto, Product.class);
-	}
+    public Product toEntity(ProductDto productDto) {
+	return modelMapper.map(productDto, Product.class);
+    }
 
-	public ProductDto toDto(Product product) {
-		return modelMapper.map(product, ProductDto.class);
-	}
+    public ProductDto toDto(Product product) {
+	return modelMapper.map(product, ProductDto.class);
+    }
 
 }

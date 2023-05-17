@@ -6,14 +6,14 @@ import com.stock.inventorymanagement.dto.SubcategoryDto;
 
 public interface SubcategoryService {
 
-	List<SubcategoryDto> getAllSubcategories();
+    List<SubcategoryDto> getAllSubcategories();
 
-	SubcategoryDto getSubcategoryById(Long id);
+    SubcategoryDto getSubcategoryById(Long id);
 
-	SubcategoryDto createSubcategory(SubcategoryDto subcategoryDto,Long userId);
+    SubcategoryDto createSubcategory(SubcategoryDto subcategoryDto, Long userId);
 
-	SubcategoryDto updateSubcategory(Long id, SubcategoryDto subcategoryDto,Long userId);
+    SubcategoryDto updateSubcategory(Long id, SubcategoryDto subcategoryDto, Long userId);
 
-	void deleteSubcategory(Long id,Long userId);
+    void deleteSubcategory(Long id, Long userId);
 
 }

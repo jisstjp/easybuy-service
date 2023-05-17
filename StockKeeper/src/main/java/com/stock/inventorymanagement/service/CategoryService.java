@@ -6,13 +6,13 @@ import com.stock.inventorymanagement.dto.CategoryDto;
 
 public interface CategoryService {
 
-	List<CategoryDto> getAllCategories();
+    List<CategoryDto> getAllCategories();
 
-	CategoryDto getCategoryById(Long id);
+    CategoryDto getCategoryById(Long id);
 
-	CategoryDto createCategory(CategoryDto categoryDto,Long userId);
+    CategoryDto createCategory(CategoryDto categoryDto, Long userId);
 
-	CategoryDto updateCategory(Long id, CategoryDto categoryDto,Long userId);
+    CategoryDto updateCategory(Long id, CategoryDto categoryDto, Long userId);
 
-	void deleteCategory(Long id,Long userId);
+    void deleteCategory(Long id, Long userId);
 }
