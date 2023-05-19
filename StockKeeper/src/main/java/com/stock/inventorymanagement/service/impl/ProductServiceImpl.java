@@ -16,11 +16,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import com.stock.inventorymanagement.domain.Brand;
 import com.stock.inventorymanagement.domain.Category;
+import com.stock.inventorymanagement.domain.Manufacturer;
 import com.stock.inventorymanagement.domain.Price;
 import com.stock.inventorymanagement.domain.Product;
 import com.stock.inventorymanagement.domain.Subcategory;
 import com.stock.inventorymanagement.dto.BrandDto;
 import com.stock.inventorymanagement.dto.CategoryDto;
+import com.stock.inventorymanagement.dto.ManufacturerDto;
 import com.stock.inventorymanagement.dto.PriceDto;
 import com.stock.inventorymanagement.dto.ProductDto;
 import com.stock.inventorymanagement.dto.SubcategoryDto;
@@ -31,6 +33,7 @@ import com.stock.inventorymanagement.mapper.PriceMapper;
 import com.stock.inventorymanagement.mapper.ProductMapper;
 import com.stock.inventorymanagement.repository.BrandRepository;
 import com.stock.inventorymanagement.repository.CategoryRepository;
+import com.stock.inventorymanagement.repository.ManufacturerRepository;
 import com.stock.inventorymanagement.repository.PriceRepository;
 import com.stock.inventorymanagement.repository.ProductRepository;
 import com.stock.inventorymanagement.repository.SubcategoryRepository;
@@ -53,9 +56,10 @@ public class ProductServiceImpl implements ProductService {
     private PriceMapper priceMapper;
     @Autowired
     private PriceRepository priceRepository;
-
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private ManufacturerRepository manufacturerRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -63,6 +67,14 @@ public class ProductServiceImpl implements ProductService {
 
 	final Product product = productMapper.toEntity(productDto);
 	product.setCreatedBy(userId);
+
+	// Set manufacturer
+	ManufacturerDto manufacturerDto = productDto.getManufacturer();
+	if (manufacturerDto != null && manufacturerDto.getId() != null) {
+	    Manufacturer manufacturer = manufacturerRepository.findById(manufacturerDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Manufacturer", "id", manufacturerDto.getId()));
+	    product.setManufacturer(manufacturer);
+	}
 
 	// Set brand
 	BrandDto brandDto = productDto.getBrand();
@@ -127,7 +139,6 @@ public class ProductServiceImpl implements ProductService {
 	existingProduct.setQuantity(productDto.getQuantity());
 	existingProduct.setQuantityInBox(productDto.getQuantityInBox());
 	existingProduct.setWeight(productDto.getWeight());
-	existingProduct.setManufacturer(productDto.getManufacturer());
 	existingProduct.setLength(productDto.getLength());
 	existingProduct.setWidth(productDto.getWidth());
 	existingProduct.setHeight(productDto.getHeight());
@@ -136,6 +147,14 @@ public class ProductServiceImpl implements ProductService {
 	// Update other fields as needed
 
 	existingProduct.setUpdatedBy(userId);
+
+	// Set manufacturer
+	ManufacturerDto manufacturerDto = productDto.getManufacturer();
+	if (manufacturerDto != null && manufacturerDto.getId() != null) {
+	    Manufacturer manufacturer = manufacturerRepository.findById(manufacturerDto.getId())
+		    .orElseThrow(() -> new ResourceNotFoundException("Manufacturer", "id", manufacturerDto.getId()));
+	    existingProduct.setManufacturer(manufacturer);
+	}
 
 	// Set brand
 	BrandDto brandDto = productDto.getBrand();

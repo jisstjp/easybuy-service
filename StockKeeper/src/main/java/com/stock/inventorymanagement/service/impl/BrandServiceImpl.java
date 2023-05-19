@@ -11,9 +11,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.stock.inventorymanagement.domain.Brand;
+import com.stock.inventorymanagement.domain.Manufacturer;
 import com.stock.inventorymanagement.dto.BrandDto;
+import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.mapper.BrandMapper;
 import com.stock.inventorymanagement.repository.BrandRepository;
+import com.stock.inventorymanagement.repository.ManufacturerRepository;
 import com.stock.inventorymanagement.service.BrandService;
 
 @Service
@@ -24,6 +27,9 @@ public class BrandServiceImpl implements BrandService {
 
     @Autowired
     private BrandMapper brandMapper;
+
+    @Autowired
+    ManufacturerRepository manufacturerRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -58,6 +64,13 @@ public class BrandServiceImpl implements BrandService {
 	existingBrand.setName(brandDto.getName());
 	existingBrand.setDescription(brandDto.getDescription());
 	existingBrand.setLogoUrl(brandDto.getLogoUrl());
+
+	if (brandDto.getManufacturerId() != null) {
+	    Manufacturer manufacturer = manufacturerRepository.findById(brandDto.getManufacturerId()).orElseThrow(
+		    () -> new ResourceNotFoundException("Manufacturer", "id", brandDto.getManufacturerId()));
+	    existingBrand.setManufacturer(manufacturer);
+	}
+
 	existingBrand.setUpdatedBy(userId);
 	Brand updatedBrand = brandRepository.save(existingBrand);
 	return brandMapper.toDto(updatedBrand);

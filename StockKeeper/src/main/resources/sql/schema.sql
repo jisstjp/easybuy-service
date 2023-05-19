@@ -245,6 +245,28 @@ INSERT INTO purchase_order_items (purchase_order_id, product_id, purchase_price,
 VALUES (1, 4, 10.50, 5, 'USD'),
        (1, 4, 15.00, 10, 'USD');
        
+  
        
  ALTER TABLE vendors MODIFY COLUMN is_deleted TINYINT(1) DEFAULT 0;
-       
+ 
+ ALTER TABLE brands
+ADD COLUMN manufacturer_id INT NULL;
+
+
+CREATE TABLE manufacturer (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255),
+  description VARCHAR(255),
+  created_by BIGINT,
+  updated_by BIGINT,
+  is_deleted BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE products ADD manufacturer_new INT;
+
+ALTER TABLE products DROP COLUMN manufacturer;
+

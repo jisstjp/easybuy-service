@@ -29,6 +29,10 @@ public class Product {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manufacturer_id")
+    private Manufacturer manufacturer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
@@ -54,8 +58,6 @@ public class Product {
     private Integer quantityInBox;
 
     private BigDecimal weight;
-
-    private String manufacturer;
 
     private BigDecimal length;
 
@@ -103,6 +105,14 @@ public class Product {
 
     public void setDescription(String description) {
 	this.description = description;
+    }
+
+    public Manufacturer getManufacturer() {
+	return manufacturer;
+    }
+
+    public void setManufacturer(Manufacturer manufacturer) {
+	this.manufacturer = manufacturer;
     }
 
     public Brand getBrand() {
@@ -159,14 +169,6 @@ public class Product {
 
     public void setWeight(BigDecimal weight) {
 	this.weight = weight;
-    }
-
-    public String getManufacturer() {
-	return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-	this.manufacturer = manufacturer;
     }
 
     public BigDecimal getLength() {

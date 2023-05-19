@@ -2,9 +2,12 @@ package com.stock.inventorymanagement.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -25,6 +28,10 @@ public class Brand {
 
     @Column(name = "is_deleted")
     private boolean deleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manufacturer_id")
+    private Manufacturer manufacturer;
 
     private Long updatedBy;
 
@@ -60,6 +67,14 @@ public class Brand {
 
     public void setLogoUrl(String logoUrl) {
 	this.logoUrl = logoUrl;
+    }
+
+    public Manufacturer getManufacturer() {
+	return manufacturer;
+    }
+
+    public void setManufacturer(Manufacturer manufacturer) {
+	this.manufacturer = manufacturer;
     }
 
     public boolean isDeleted() {

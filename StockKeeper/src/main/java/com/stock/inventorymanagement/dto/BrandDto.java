@@ -5,6 +5,7 @@ public class BrandDto {
     private String name;
     private String description;
     private String logoUrl;
+    private Long manufacturerId;
 
     public Long getId() {
 	return id;
@@ -36,6 +37,14 @@ public class BrandDto {
 
     public void setLogoUrl(String logoUrl) {
 	this.logoUrl = logoUrl;
+    }
+
+    public Long getManufacturerId() {
+	return manufacturerId;
+    }
+
+    public void setManufacturerId(Long manufacturerId) {
+	this.manufacturerId = manufacturerId;
     }
 
 }
