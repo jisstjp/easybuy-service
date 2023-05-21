@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "brands")
 public class Brand {
@@ -31,6 +33,7 @@ public class Brand {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manufacturer_id")
+    @JsonBackReference
     private Manufacturer manufacturer;
 
     private Long updatedBy;

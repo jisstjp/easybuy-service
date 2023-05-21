@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "manufacturer")
 public class Manufacturer {
@@ -28,6 +30,7 @@ public class Manufacturer {
     private String description;
 
     @OneToMany(mappedBy = "manufacturer")
+    @JsonManagedReference
     private List<Brand> brands;
 
     @Column(name = "created_by")

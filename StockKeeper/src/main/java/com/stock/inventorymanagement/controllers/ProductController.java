@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.stock.inventorymanagement.dto.ProductDto;
+import com.stock.inventorymanagement.dto.ProductSearchCriteria;
 import com.stock.inventorymanagement.exception.ErrorResponse;
 import com.stock.inventorymanagement.exception.InvalidPriceTypeException;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
@@ -93,6 +93,14 @@ public class ProductController extends BaseController {
 	    ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
 	    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	}
+    }
+
+    @PostMapping("/search")
+    public Page<ProductDto> searchProducts(@RequestBody ProductSearchCriteria searchCriteria) {
+	int page = searchCriteria.getPage();
+	int size = searchCriteria.getSize();
+	Pageable pageable = PageRequest.of(page, size);
+	return productService.searchProducts(searchCriteria, pageable);
     }
 
     private Sort getSort(String sort) {

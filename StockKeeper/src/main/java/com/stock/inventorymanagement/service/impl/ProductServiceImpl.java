@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.stock.inventorymanagement.dao.ProductDao;
 import com.stock.inventorymanagement.domain.Brand;
 import com.stock.inventorymanagement.domain.Category;
 import com.stock.inventorymanagement.domain.Manufacturer;
@@ -25,6 +27,7 @@ import com.stock.inventorymanagement.dto.CategoryDto;
 import com.stock.inventorymanagement.dto.ManufacturerDto;
 import com.stock.inventorymanagement.dto.PriceDto;
 import com.stock.inventorymanagement.dto.ProductDto;
+import com.stock.inventorymanagement.dto.ProductSearchCriteria;
 import com.stock.inventorymanagement.dto.SubcategoryDto;
 import com.stock.inventorymanagement.enums.PriceType;
 import com.stock.inventorymanagement.exception.InvalidPriceTypeException;
@@ -60,6 +63,8 @@ public class ProductServiceImpl implements ProductService {
     private EntityManager entityManager;
     @Autowired
     private ManufacturerRepository manufacturerRepository;
+    @Autowired
+    private ProductDao productDao;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -243,6 +248,15 @@ public class ProductServiceImpl implements ProductService {
 	Page<Product> productsPage = productRepository.findAll(pageable);
 	List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
 	return new PageImpl<>(productDtos, pageable, productsPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable) {
+	Page<Product> productsPage = productDao.searchProducts(searchCriteria, pageable);
+	List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
+	return new PageImpl<>(productDtos, pageable, productsPage.getTotalElements());
+
     }
 
 }
