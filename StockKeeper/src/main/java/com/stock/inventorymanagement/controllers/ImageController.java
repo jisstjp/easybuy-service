@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,19 +24,33 @@ public class ImageController {
     public ImageController(S3Service s3Service) {
 	this.s3Service = s3Service;
     }
-
+    
     @PostMapping
-    public String uploadImageToS3(@RequestParam("file") MultipartFile file) throws IOException {
-	File tempFile = File.createTempFile("image", file.getOriginalFilename());
-	file.transferTo(tempFile);
+     public ResponseEntity<String> uploadImageToS3(@RequestParam("file") MultipartFile file) {
+        try {
+            // Check if file size exceeds the limit (in bytes)
+            long fileSizeLimit = 10 * 1024 * 1024; // 10MB 
+            if (file.getSize() > fileSizeLimit) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File size exceeds the allowed limit");
+            }
 
-	String keyName = file.getOriginalFilename();
+            File tempFile = File.createTempFile("image", file.getOriginalFilename());
+            file.transferTo(tempFile);
 
-	String imageUrl = s3Service.uploadFileToS3(tempFile, keyName);
+            String imageUrl = s3Service.uploadFileToS3(tempFile, file.getOriginalFilename());
 
-	tempFile.delete(); // Cleanup temporary file
+            tempFile.delete(); // Cleanup temporary file
 
-	return imageUrl;
+            return ResponseEntity.ok(imageUrl);
+        } catch (IOException e) {
+            // Handle IO exception (file transfer, temporary file creation, etc.)
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+        } catch (Exception e) {
+            // Handle any other general exception
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process image upload");
+        }
     }
 
 }
