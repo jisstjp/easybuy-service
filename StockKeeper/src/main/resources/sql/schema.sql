@@ -270,3 +270,42 @@ ALTER TABLE products ADD manufacturer_new INT;
 
 ALTER TABLE products DROP COLUMN manufacturer;
 
+ALTER TABLE products
+ADD COLUMN barcode VARCHAR(255);
+
+
+CREATE TABLE `customers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `newsletter` tinyint(1) DEFAULT '0',
+  `tax_file` varchar(255) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `tax_id_number` varchar(255) DEFAULT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `address_line1` varchar(255) DEFAULT NULL,
+  `address_line2` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state_province` varchar(255) DEFAULT NULL,
+  `zip_postal_code` varchar(20) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `business_name` varchar(255) DEFAULT NULL,
+  `business_setup` varchar(255) DEFAULT NULL,
+  `business_organization` varchar(255) DEFAULT NULL,
+  `years_in_business` int DEFAULT NULL,
+  `locations` int DEFAULT NULL,
+  `business_type` varchar(255) DEFAULT NULL,
+  `sales_channel` varchar(255) DEFAULT NULL,
+  `how_did_you_hear` varchar(255) DEFAULT NULL,
+  `monthly_inventory_budget` decimal(10,2) DEFAULT NULL,
+  `created_by` bigint DEFAULT NULL,
+  `updated_by` bigint DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `approval_status` char(1) DEFAULT 'P',
+  PRIMARY KEY (`id`)
+) ;

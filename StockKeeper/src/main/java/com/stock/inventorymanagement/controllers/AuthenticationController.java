@@ -33,7 +33,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
-	authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+ 	authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
 	final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 

@@ -35,11 +35,18 @@ public class S3ServiceImpl implements S3Service {
 		.credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
 		.build();
 
-	PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).build();
+	String uniqueKeyName = generateUniqueKeyName(keyName);
+
+	PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucketName).key(uniqueKeyName).build();
 
 	s3Client.putObject(objectRequest, file.toPath());
 
-	return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + keyName;
+	return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + uniqueKeyName;
+    }
+
+    private String generateUniqueKeyName(String originalKeyName) {
+	String uniqueString = String.valueOf(System.currentTimeMillis());
+	return originalKeyName + "_" + uniqueString;
     }
 
 }

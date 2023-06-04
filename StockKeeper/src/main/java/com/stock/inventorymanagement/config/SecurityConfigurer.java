@@ -1,6 +1,11 @@
 package com.stock.inventorymanagement.config;
 
+import java.util.Arrays;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +34,9 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    @Value("${app.allowed.endpoints}")
+    private String allowedEndpoints;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 	auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
@@ -47,12 +55,19 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-	httpSecurity.csrf().disable().authorizeRequests().antMatchers("/api/v1/auth/login").permitAll().anyRequest()
-		.authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	httpSecurity.csrf().disable().authorizeRequests().antMatchers("/api/v1/auth/login").permitAll()
+		.requestMatchers(this::isAllowedEndpoint).permitAll().anyRequest().authenticated().and()
+		.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	httpSecurity.cors();
 
 	httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    private boolean isAllowedEndpoint(HttpServletRequest request) {
+	String requestUri = request.getRequestURI();
+	String[] allowedEndpointsArr = allowedEndpoints.split(",");
+	return Arrays.stream(allowedEndpointsArr).map(String::trim).anyMatch(requestUri::startsWith);
     }
 }

@@ -149,6 +149,8 @@ public class ProductServiceImpl implements ProductService {
 	existingProduct.setHeight(productDto.getHeight());
 	existingProduct.setImageUrl(productDto.getImageUrl());
 	existingProduct.setIsAvailable(productDto.getIsAvailable());
+	existingProduct.setBarCode(productDto.getBarCode());
+
 	// Update other fields as needed
 
 	existingProduct.setUpdatedBy(userId);

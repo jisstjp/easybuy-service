@@ -26,6 +26,7 @@ public class ProductDto {
     private BigDecimal height;
     private String imageUrl;
     private String upc;
+    private String barCode;
     private Boolean isAvailable = true;
 
     public Long getId() {
@@ -178,6 +179,14 @@ public class ProductDto {
 
     public void setIsAvailable(Boolean isAvailable) {
 	this.isAvailable = isAvailable;
+    }
+
+    public String getBarCode() {
+	return barCode;
+    }
+
+    public void setBarCode(String barCode) {
+	this.barCode = barCode;
     }
 
 }
