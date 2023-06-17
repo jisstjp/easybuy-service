@@ -104,6 +104,8 @@ public class ProductServiceImpl implements ProductService {
 		    .orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
 	    product.setSubcategory(subcategory);
 	}
+	
+	product.setIsDeleted(false);
 
 	Product savedProduct = productRepository.save(product);
 

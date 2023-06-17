@@ -309,3 +309,58 @@ CREATE TABLE `customers` (
   `approval_status` char(1) DEFAULT 'P',
   PRIMARY KEY (`id`)
 ) ;
+
+
+
+
+CREATE TABLE cart (
+  id INT PRIMARY KEY,
+  user_id INT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  is_deleted BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE cart_items (
+  id INT PRIMARY KEY,
+  cart_id INT,
+  product_id INT,
+  quantity INT,
+  price DECIMAL(10, 2),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  is_deleted BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  total_price DECIMAL(10, 2),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
+
+CREATE TABLE order_items (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  order_id INT,
+  product_id INT,
+  quantity INT,
+  price DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  is_deleted BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE payment (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  order_id INT,
+  amount DECIMAL(10, 2),
+  payment_method VARCHAR(100),
+  status VARCHAR(50),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  is_deleted BOOLEAN DEFAULT FALSE
+);
+
+ALTER TABLE orders
+ADD COLUMN order_status VARCHAR(255) NOT NULL DEFAULT 'PENDING';
