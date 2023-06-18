@@ -13,6 +13,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.stock.inventorymanagement.security.CustomUserDetails;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,13 +33,14 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(CustomUserDetails userDetails) {
 	Map<String, Object> claims = new HashMap<>();
 	final String authorities = userDetails.getAuthorities()
 	                .stream()
 	                .map(GrantedAuthority::getAuthority)
 	                .collect(Collectors.joining(","));
 	claims.put("authorities", authorities);
+	claims.put("userId", userDetails.getUserId());
 	  return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).setIssuedAt(new Date())
 		.setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
 		.signWith(SignatureAlgorithm.HS512, secret).compact();

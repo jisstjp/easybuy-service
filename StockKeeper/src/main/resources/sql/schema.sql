@@ -310,57 +310,66 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`id`)
 ) ;
 
+------Cart & Order 
 
 
+CREATE TABLE `cart` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+)
 
-CREATE TABLE cart (
-  id INT PRIMARY KEY,
-  user_id INT,
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP,
-  is_deleted BOOLEAN DEFAULT FALSE
-);
 
-CREATE TABLE cart_items (
-  id INT PRIMARY KEY,
-  cart_id INT,
-  product_id INT,
-  quantity INT,
-  price DECIMAL(10, 2),
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP,
-  is_deleted BOOLEAN DEFAULT FALSE
-);
+CREATE TABLE `cart_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `cart_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+)
 
-CREATE TABLE orders (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT,
-  total_price DECIMAL(10, 2),
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP
-);
+CREATE TABLE `orders` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `total_price` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  `order_status` varchar(255) NOT NULL DEFAULT 'PENDING',
+  `shipping_address` varchar(2000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+)
 
-CREATE TABLE order_items (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  order_id INT,
-  product_id INT,
-  quantity INT,
-  price DECIMAL(10, 2),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  is_deleted BOOLEAN DEFAULT FALSE
-);
+CREATE TABLE `order_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+)
 
-CREATE TABLE payment (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  order_id INT,
-  amount DECIMAL(10, 2),
-  payment_method VARCHAR(100),
-  status VARCHAR(50),
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP,
-  is_deleted BOOLEAN DEFAULT FALSE
-);
+CREATE TABLE `payment` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `payment_method` varchar(100) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+)
 
-ALTER TABLE orders
-ADD COLUMN order_status VARCHAR(255) NOT NULL DEFAULT 'PENDING';
+
+INSERT INTO roles (name) VALUES ('ROLE_CUSTOMER');

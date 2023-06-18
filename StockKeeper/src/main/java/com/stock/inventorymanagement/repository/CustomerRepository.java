@@ -13,5 +13,6 @@ import com.stock.inventorymanagement.domain.Customer;
 public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
     Page<Customer> findAll(Specification<Customer> specification, Pageable pageable);
+    Customer findByEmail(String email); 
 
 }

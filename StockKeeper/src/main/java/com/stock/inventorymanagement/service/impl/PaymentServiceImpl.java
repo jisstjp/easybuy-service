@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,9 @@ public class PaymentServiceImpl implements PaymentService {
 	Payment payment = new Payment();
 	payment.setOrderId(order.getId());
 	payment.setAmount(order.getTotalPrice());
-	payment.setPaymentMethod(orderDto.getPayment().getPaymentMethod());
-	payment.setStatus("Pending");
+	//payment.setPaymentMethod(orderDto.getPayment().getPaymentMethod());
+	payment.setStatus(Optional.ofNullable(orderDto.getPayment().getStatus()).orElse("Pending"));
+	payment.setPaymentMethod(Optional.ofNullable(orderDto.getPayment().getPaymentMethod()).orElse("Cash"));
 	payment.setCreatedAt(LocalDateTime.now());
 	payment.setUpdatedAt(LocalDateTime.now());
 	payment.setDeleted(false);

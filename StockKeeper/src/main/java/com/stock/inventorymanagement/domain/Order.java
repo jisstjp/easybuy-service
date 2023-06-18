@@ -30,6 +30,9 @@ public class Order {
     @Column(name = "order_status")
     private String orderStatus;
 
+    @Column(name = "shipping_address")
+    private String shippingAddress;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -94,8 +97,13 @@ public class Order {
     public void setOrderStatus(String orderStatus) {
 	this.orderStatus = orderStatus;
     }
-    
-    
-    
+
+    public String getShippingAddress() {
+	return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+	this.shippingAddress = shippingAddress;
+    }
 
 }

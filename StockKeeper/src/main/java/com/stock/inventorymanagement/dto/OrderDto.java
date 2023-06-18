@@ -3,6 +3,10 @@ package com.stock.inventorymanagement.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class OrderDto {
 
     private Long id;
@@ -11,6 +15,7 @@ public class OrderDto {
     private BigDecimal totalPrice;
     private PaymentDto payment;
     private String orderStatus;
+    private String shippingAddress;
     private List<OrderItemDto> orderItems;
 
     public Long getId() {
@@ -67,6 +72,14 @@ public class OrderDto {
 
     public void setOrderItems(List<OrderItemDto> orderItems) {
 	this.orderItems = orderItems;
+    }
+
+    public String getShippingAddress() {
+	return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+	this.shippingAddress = shippingAddress;
     }
 
 }
