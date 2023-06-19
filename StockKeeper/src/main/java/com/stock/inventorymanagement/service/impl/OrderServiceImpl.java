@@ -7,6 +7,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +23,7 @@ import com.stock.inventorymanagement.domain.Payment;
 import com.stock.inventorymanagement.domain.User;
 import com.stock.inventorymanagement.dto.OrderDto;
 import com.stock.inventorymanagement.dto.OrderItemDto;
+import com.stock.inventorymanagement.dto.OrderSearchCriteria;
 import com.stock.inventorymanagement.dto.PaymentDto;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.mapper.OrderItemMapper;
@@ -31,6 +37,7 @@ import com.stock.inventorymanagement.repository.PaymentRepository;
 import com.stock.inventorymanagement.repository.UserRepository;
 import com.stock.inventorymanagement.service.OrderService;
 import com.stock.inventorymanagement.service.PaymentService;
+import com.stock.inventorymanagement.specification.OrderSpecifications;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -64,6 +71,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private PaymentMapper paymentMapper;
+
+    @Autowired
+    private OrderSpecifications orderSpecifications;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -138,34 +148,31 @@ public class OrderServiceImpl implements OrderService {
 
 	return orderDto;
     }
-    
-    
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void cancelOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+	Order order = orderRepository.findByIdAndUserId(orderId, userId)
+		.orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
-        // Check if the order is already cancelled
-        if (order.getOrderStatus().equals("Cancelled")) {
-            throw new IllegalStateException("Order is already cancelled.");
-        }
+	// Check if the order is already cancelled
+	if (order.getOrderStatus().equals("Cancelled")) {
+	    throw new IllegalStateException("Order is already cancelled.");
+	}
 
 	// Update the order status to "Cancelled"
-        order.setOrderStatus("Cancelled");
+	order.setOrderStatus("Cancelled");
 
+	// Save the updated order
+	orderRepository.save(order);
 
-        // Save the updated order
-        orderRepository.save(order);
+	// Cancel the associated payment, if applicable
+	Payment payment = paymentRepository.findByOrderId(order.getId()).orElse(null);
 
-        // Cancel the associated payment, if applicable
-        Payment payment = paymentRepository.findByOrderId(order.getId())
-                .orElse(null);
-
-        if (payment != null) {
-            payment.setStatus("Cancelled");
-            paymentRepository.save(payment);
-        }
+	if (payment != null) {
+	    payment.setStatus("Cancelled");
+	    paymentRepository.save(payment);
+	}
     }
 
     private OrderDto mapToDto(Order order) {
@@ -173,6 +180,89 @@ public class OrderServiceImpl implements OrderService {
 	orderDto.setId(order.getId());
 	orderDto.setTotalPrice(order.getTotalPrice());
 	return orderDto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderDto> getOrdersByUserId(Long userId, int page, int size) {
+	Pageable pageable = PageRequest.of(page, size);
+	Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
+	List<OrderDto> orderDtos = orderPage.getContent().stream().map(order -> {
+	    OrderDto orderDto = orderMapper.toDto(order);
+	    List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
+	    List<OrderItemDto> orderItemDtos = orderItems.stream().map(orderItemMapper::toDto)
+		    .collect(Collectors.toList());
+	    orderDto.setOrderItems(orderItemDtos);
+	    return orderDto;
+	}).collect(Collectors.toList());
+	return new PageImpl<>(orderDtos, pageable, orderPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderDto> searchOrders(OrderSearchCriteria searchCriteria, Pageable pageable) {
+	Specification<Order> specification = orderSpecifications.buildSpecification(searchCriteria.getField(),
+		searchCriteria.getValue(), searchCriteria.getMatchType());
+	Page<Order> orderPage = orderRepository.findAll(specification, pageable);
+	List<OrderDto> orderDtoList = orderPage.getContent().stream().map(orderMapper::toDto)
+		.collect(Collectors.toList());
+	return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public OrderDto updateOrder(Long orderId, OrderDto orderDto) {
+	// Retrieve the existing order from the database
+	Order existingOrder = orderRepository.findById(orderId)
+		.orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+	// Update the relevant fields of the order using the values from the orderDto
+	// existingOrder.setTotalPrice(orderDto.getTotalPrice());
+	if (orderDto.getShippingAddress() != null) {
+	    existingOrder.setShippingAddress(orderDto.getShippingAddress());
+	}
+	if (orderDto.getOrderStatus() != null) {
+	    existingOrder.setOrderStatus(orderDto.getOrderStatus());
+	}
+
+	// Find the associated payment entity using the orderId
+	Optional<Payment> optionalPayment = paymentRepository.findByOrderId(orderId);
+
+	// Update the payment status if the payment entity exists and the paymentStatus
+	// is provided
+	optionalPayment.ifPresent(payment -> {
+	    if (orderDto.getPayment() != null && orderDto.getPayment().getStatus() != null) {
+		payment.setStatus(orderDto.getPayment().getStatus());
+		paymentRepository.save(payment);
+	    }
+	});
+
+	// Save the updated order
+	Order updatedOrder = orderRepository.save(existingOrder);
+
+	// Convert the updated order to OrderDto and return
+	return orderMapper.toDto(updatedOrder);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDto getOrder(Long orderId) {
+	Order order = orderRepository.findById(orderId)
+		.orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+	OrderDto orderDto = orderMapper.toDto(order);
+
+	List<OrderItemDto> orderItemDtos = orderItemRepository.findByOrderId(orderId).stream()
+		.map(orderItem -> orderItemMapper.toDto(orderItem)).collect(Collectors.toList());
+	orderDto.setOrderItems(orderItemDtos);
+
+	Payment payment = paymentRepository.findByOrderId(orderId)
+		.orElseThrow(() -> new ResourceNotFoundException("Payment", "order_id", orderId));
+	PaymentDto paymentDto = paymentMapper.toDto(payment);
+	orderDto.setPayment(paymentDto);
+
+	return orderDto;
+
     }
 
 }

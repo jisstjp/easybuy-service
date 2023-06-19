@@ -1,13 +1,25 @@
 package com.stock.inventorymanagement.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.stock.inventorymanagement.dto.OrderDto;
+import com.stock.inventorymanagement.dto.OrderSearchCriteria;
 
 public interface OrderService {
 
     OrderDto createOrder(Long userId, OrderDto orderDto);
-    OrderDto getOrder(Long userId, Long orderId);
-     void cancelOrder(Long userId, Long orderId);
-    //OrderDto getOrder(Long orderId);
 
+    OrderDto getOrder(Long userId, Long orderId);
+
+    void cancelOrder(Long userId, Long orderId);
+
+    Page<OrderDto> getOrdersByUserId(Long userId, int page, int size);
+
+    Page<OrderDto> searchOrders(OrderSearchCriteria searchCriteria, Pageable pageable);
+
+    OrderDto updateOrder(Long orderId, OrderDto orderDto);
+
+    OrderDto getOrder(Long orderId);
 
 }
