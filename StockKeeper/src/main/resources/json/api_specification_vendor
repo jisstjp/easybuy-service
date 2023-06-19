@@ -1,0 +1,77 @@
+1.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MzM1NzU3NSwiaWF0IjoxNjgzMzUzOTc1fQ.GStYl_gLllVkD3n-5P0_19Rj5HM0jpw5eqIKWAu12D8-5hWQTa9z0wxralv4utlWs-WgAItbBM7_Q_ulUnm3Pw");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/vendors", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+  
+2.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MzM1NzU3NSwiaWF0IjoxNjgzMzUzOTc1fQ.GStYl_gLllVkD3n-5P0_19Rj5HM0jpw5eqIKWAu12D8-5hWQTa9z0wxralv4utlWs-WgAItbBM7_Q_ulUnm3Pw");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/vendors/1?Authorization", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+  
+ 3.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MzM1NzU3NSwiaWF0IjoxNjgzMzUzOTc1fQ.GStYl_gLllVkD3n-5P0_19Rj5HM0jpw5eqIKWAu12D8-5hWQTa9z0wxralv4utlWs-WgAItbBM7_Q_ulUnm3Pw");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "name": "ABC Corp",
+  "address": "123 Main St.",
+  "phoneNumber": "555-1234",
+  "email": "abc@example.com"
+});
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/vendors", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+  
+  4.var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MzM1NzU3NSwiaWF0IjoxNjgzMzUzOTc1fQ.GStYl_gLllVkD3n-5P0_19Rj5HM0jpw5eqIKWAu12D8-5hWQTa9z0wxralv4utlWs-WgAItbBM7_Q_ulUnm3Pw");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "id": 5,
+  "name": "ABC Inc.",
+  "address": "123 Main St.",
+  "phoneNumber": "555-555-1234",
+  "email": "abc@example.com"
+});
+
+var requestOptions = {
+  method: 'PUT',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/vendors/5", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));

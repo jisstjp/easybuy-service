@@ -1,0 +1,81 @@
+1./api/v1/brands
+ 
+ var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjQwNDQ5MywiaWF0IjoxNjgyNDAwODkzfQ.ToCMFcxAhNlPX36G7Tu4IQRG9AaB_RkXkJ-q0BnCDfcmwOxBsRwLrjpbt4I_-HwvbMH-xt40y4z8GiBNNijLgw");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "name": "Nike",
+  "description": "An American multinational corporation specializing in the design, development, manufacturing, and sales of footwear, apparel, and accessories.",
+  "logoUrl": "https://example.com/nike_logo.jpg"
+});
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+
+fetch("http://localhost:8080/api/v1/brands", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+2./api/v1/brands/5
+  
+ var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjQwMzYyMywiaWF0IjoxNjgyNDAwMDIzfQ.D6rnYbNEFWpVJfrf5Ttw3J9RT_KyoVuKo8phvHeeFZAlecjlBAA-DLzbzfBhefqduueW1PBnKLOnnQ8yL0odUw");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "name": "Nike",
+  "description": "An American multinational corporation that is engaged in the design, development, manufacturing, and worldwide marketing and sales of footwear, apparel, equipment, accessories, and services.",
+  "logoUrl": "https://www.logosvgpng.com/wp-content/uploads/2021/02/nike-logo-vector.png"
+});
+
+var requestOptions = {
+  method: 'PUT',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/brands/5", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error))
+  
+3./api/v1/brands
+  
+  var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjQwMzYyMywiaWF0IjoxNjgyNDAwMDIzfQ.D6rnYbNEFWpVJfrf5Ttw3J9RT_KyoVuKo8phvHeeFZAlecjlBAA-DLzbzfBhefqduueW1PBnKLOnnQ8yL0odUw");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/brands", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+  
+4./api/v1/brands/3
+ 
+ var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huX2RvZSIsImV4cCI6MTY4MjQwMzYyMywiaWF0IjoxNjgyNDAwMDIzfQ.D6rnYbNEFWpVJfrf5Ttw3J9RT_KyoVuKo8phvHeeFZAlecjlBAA-DLzbzfBhefqduueW1PBnKLOnnQ8yL0odUw");
+
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("http://localhost:8080/api/v1/brands/3", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error))
+  
