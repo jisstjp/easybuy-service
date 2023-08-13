@@ -27,6 +27,7 @@ public class ProductDto {
     private String imageUrl;
     private String upc;
     private String barCode;
+    private String flavor;
     private Boolean isAvailable = true;
 
     public Long getId() {
@@ -187,6 +188,14 @@ public class ProductDto {
 
     public void setBarCode(String barCode) {
 	this.barCode = barCode;
+    }
+
+    public String getFlavor() {
+	return flavor;
+    }
+
+    public void setFlavor(String flavor) {
+	this.flavor = flavor;
     }
 
 }

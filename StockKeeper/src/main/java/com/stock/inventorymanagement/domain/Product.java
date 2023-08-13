@@ -74,6 +74,9 @@ public class Product {
     @Column(name = "barcode")
     private String barCode;
 
+    @Column
+    private String flavor;
+
     @Column(name = "is_available")
     private Boolean isAvailable = true;
 
@@ -268,6 +271,14 @@ public class Product {
 
     public void setBarCode(String barCode) {
 	this.barCode = barCode;
+    }
+
+    public String getFlavor() {
+	return flavor;
+    }
+
+    public void setFlavor(String flavor) {
+	this.flavor = flavor;
     }
 
 }

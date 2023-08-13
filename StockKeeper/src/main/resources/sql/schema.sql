@@ -373,3 +373,9 @@ CREATE TABLE `payment` (
 
 
 INSERT INTO roles (name) VALUES ('ROLE_CUSTOMER');
+
+ALTER TABLE products ADD COLUMN flavor VARCHAR(255);
+
+
+
+

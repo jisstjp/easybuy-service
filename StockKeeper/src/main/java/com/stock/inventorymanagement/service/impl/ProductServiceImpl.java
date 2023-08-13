@@ -152,6 +152,7 @@ public class ProductServiceImpl implements ProductService {
 	existingProduct.setImageUrl(productDto.getImageUrl());
 	existingProduct.setIsAvailable(productDto.getIsAvailable());
 	existingProduct.setBarCode(productDto.getBarCode());
+	existingProduct.setFlavor(productDto.getFlavor());
 
 	// Update other fields as needed
 
