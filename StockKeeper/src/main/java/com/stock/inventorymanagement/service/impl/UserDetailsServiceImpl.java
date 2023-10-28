@@ -3,6 +3,7 @@ package com.stock.inventorymanagement.service.impl;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.stock.inventorymanagement.domain.Cart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,8 +34,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 	Set<GrantedAuthority> grantedAuthorities = user.getRoles().stream().map(Role::getName)
 		.map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
-
-	return new CustomUserDetails(user.getUsername(), bcryptEncoder.encode(user.getPassword()), user.getId(),
+        Cart cart = user.getCart();
+        Long cartId = (cart != null) ? cart.getId() : -1;
+	return new CustomUserDetails(user.getUsername(), bcryptEncoder.encode(user.getPassword()), user.getId(),cartId,
 		grantedAuthorities);
 
     }
