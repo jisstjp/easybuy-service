@@ -6,7 +6,7 @@ public enum Operator {
     GREATER_THAN_OR_EQUALS("greaterThanOrEquals"), LESS_THAN_OR_EQUALS("lessThanOrEquals"), CONTAINS("contains"),
     STARTS_WITH("startsWith"), ENDS_WITH("endsWith"),
 
-    IN_OPERATOR("inOperator");
+    IN_OPERATOR("in");
 
     private final String value;
 
