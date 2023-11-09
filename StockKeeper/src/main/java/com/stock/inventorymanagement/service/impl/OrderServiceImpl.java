@@ -5,6 +5,7 @@ import com.stock.inventorymanagement.dto.OrderDto;
 import com.stock.inventorymanagement.dto.OrderItemDto;
 import com.stock.inventorymanagement.dto.OrderSearchCriteria;
 import com.stock.inventorymanagement.dto.PaymentDto;
+import com.stock.inventorymanagement.enums.PriceType;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.mapper.OrderItemMapper;
 import com.stock.inventorymanagement.mapper.OrderMapper;
@@ -77,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepository.findByIdAndUserId(orderDto.getCartId(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", orderDto.getCartId()));
 
-        BigDecimal totalPrice = calculateTotalPriceFromProduct(cart);
+        BigDecimal totalPrice = calculateTotalSalesPriceForCart(cart);
 
         Order order = new Order();
         order.setUser(user);
@@ -136,6 +137,28 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add); // Sum up all the prices
     }
+
+
+    private BigDecimal calculateTotalSalesPriceForCart(Cart cart) {
+        return cart.getCartItems().stream()
+                .map(cartItem -> {
+                    // Fetch the product to access its prices
+                    Product product = productRepository.findById(cartItem.getProductId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Product", "id", cartItem.getProductId()));
+
+                    // Find the sales price from the list of prices associated with the product
+                    Double salesPrice = product.getPrices().stream()
+                            .filter(price -> price.getPriceType() == PriceType.SALES_PRICE && !price.isDeleted())
+                            .map(Price::getPrice)
+                            .findFirst()
+                            .orElse(0.0);
+
+                    // Calculate price by multiplying with the quantity
+                    return BigDecimal.valueOf(salesPrice).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // Sum up all the prices
+    }
+
 
 
     @Override
