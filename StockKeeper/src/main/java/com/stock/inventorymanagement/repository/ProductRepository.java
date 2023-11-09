@@ -20,7 +20,8 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     Page<Product> findAll(Pageable pageable);
     
     
-    @Query("SELECT p FROM Product p WHERE p.id = :id AND p.isDeleted = false")
+    //@Query("SELECT p FROM Product p WHERE p.id = :id AND p.isDeleted = false")
+    @Query("SELECT p FROM Product p WHERE p.id = :id AND (p.isDeleted = false OR p.isDeleted IS NULL)")
      Optional<Product> findByIdAndIsDeletedFalse(Long id);
     
     List<Product> findByIdIn(List<Long> productIds);
