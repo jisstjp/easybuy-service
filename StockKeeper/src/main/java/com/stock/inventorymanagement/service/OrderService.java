@@ -16,6 +16,9 @@ public interface OrderService {
 
     Page<OrderDto> getOrdersByUserId(Long userId, int page, int size);
 
+    Page<OrderDto> getOrdersByUserId(Long userId, Pageable pageable);
+
+
     Page<OrderDto> searchOrders(OrderSearchCriteria searchCriteria, Pageable pageable);
 
     OrderDto updateOrder(Long orderId, OrderDto orderDto);

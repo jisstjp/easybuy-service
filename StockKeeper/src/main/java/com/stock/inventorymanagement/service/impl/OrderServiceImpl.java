@@ -230,6 +230,23 @@ public class OrderServiceImpl implements OrderService {
         return new PageImpl<>(orderDtos, pageable, orderPage.getTotalElements());
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderDto> getOrdersByUserId(Long userId, Pageable pageable) {
+        Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
+        List<OrderDto> orderDtos = orderPage.getContent().stream().map(order -> {
+            OrderDto orderDto = orderMapper.toDto(order);
+            List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
+            List<OrderItemDto> orderItemDtos = orderItems.stream().map(orderItemMapper::toDto)
+                    .collect(Collectors.toList());
+            orderDto.setOrderItems(orderItemDtos);
+            return orderDto;
+        }).collect(Collectors.toList());
+        return new PageImpl<>(orderDtos, pageable, orderPage.getTotalElements());
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderDto> searchOrders(OrderSearchCriteria searchCriteria, Pageable pageable) {
