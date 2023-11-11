@@ -1,5 +1,6 @@
 package com.stock.inventorymanagement.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,9 @@ public class CartItemServiceImpl implements CartItemService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ProductServiceImpl productService;
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItemDto> getCartItemsByCartId(Long cartId) {
@@ -60,6 +64,8 @@ public class CartItemServiceImpl implements CartItemService {
 
 	// Set the cartId on the cartItem entity
 	cartItem.setProductId(product.getId());
+    cartItem.setPrice(safelyFetchSalesPrice(product.getId(),cartItem.getPrice()));
+
 	cartItem.setCart(cart);
 	cartItem.setCreatedAt(LocalDateTime.now());
 	cartItem.setUpdatedAt(LocalDateTime.now());
@@ -75,9 +81,14 @@ public class CartItemServiceImpl implements CartItemService {
 	CartItem existingCartItem = cartItemRepository.findByCartIdAndItemIdWithoutDeleted(cartId, itemId)
 		.orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
 
+        // Check if the product exists and is not deleted
+        Product product = productRepository.findByIdAndIsDeletedFalse(cartItemDto.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", cartItemDto.getProductId()));
+
 	existingCartItem.setQuantity(cartItemDto.getQuantity());
-	existingCartItem.setPrice(cartItemDto.getPrice());
-	// Update other fields as needed
+    existingCartItem.setPrice(safelyFetchSalesPrice(product.getId(),existingCartItem.getPrice()));
+
+        // Update other fields as needed
 	existingCartItem.setUpdatedAt(LocalDateTime.now());
 	CartItem savedCartItem = cartItemRepository.save(existingCartItem);
 	return cartItemMapper.toDto(savedCartItem);
@@ -194,6 +205,15 @@ public class CartItemServiceImpl implements CartItemService {
         return updatedCartItems.stream()
                 .map(cartItemMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private BigDecimal safelyFetchSalesPrice(Long productId, BigDecimal fallbackPrice) {
+        try {
+            return productService.getSalesPrice(productId);
+        } catch (Exception e) {
+            // Log the exception if necessary
+            return fallbackPrice;
+        }
     }
 
 

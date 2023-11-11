@@ -77,6 +77,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private IEmailService emailService;
 
+    @Autowired
+    ProductServiceImpl productService;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public OrderDto createOrder(Long userId, OrderDto orderDto) {
@@ -108,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(savedOrder);
             orderItem.setProductId(cartItem.getProductId());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getPrice());
+            orderItem.setPrice(safelyFetchSalesPrice(cartItem.getProductId(),cartItem.getPrice()));
             orderItem.setDeleted(false);
             orderItem.setCreatedAt(LocalDateTime.now());
             orderItem.setUpdatedAt(LocalDateTime.now());
@@ -360,6 +363,15 @@ public class OrderServiceImpl implements OrderService {
             emailService.sendEmailWithAttachment(recipientEmail, subject, htmlBody, attachmentFilename, pdfBytes);
         } catch (Exception e) {
             // Handle exceptions appropriately
+        }
+    }
+
+    private BigDecimal safelyFetchSalesPrice(Long productId, BigDecimal fallbackPrice) {
+        try {
+            return productService.getSalesPrice(productId);
+        } catch (Exception e) {
+            // Log the exception if necessary
+            return fallbackPrice;
         }
     }
 
