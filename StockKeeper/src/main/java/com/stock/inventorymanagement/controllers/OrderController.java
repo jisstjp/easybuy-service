@@ -2,18 +2,26 @@ package com.stock.inventorymanagement.controllers;
 
 import com.stock.inventorymanagement.dto.OrderDto;
 import com.stock.inventorymanagement.service.OrderService;
+import com.stock.inventorymanagement.service.impl.PdfGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/users/{userId}/orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PdfGenerationServiceImpl pdfGenerationService;
 
     @PostMapping("/create")
     public ResponseEntity<OrderDto> createOrder(@PathVariable Long userId, @RequestBody OrderDto orderDto) {
@@ -47,6 +55,26 @@ public class OrderController {
         Sort sort = order.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Page<OrderDto> orders = orderService.getOrdersByUserId(userId, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(orders);
+    }
+
+
+    @GetMapping("/{orderId}/pdf")
+    public ResponseEntity<ByteArrayResource> getOrderPdf(@PathVariable Long userId, @PathVariable Long orderId) {
+        try {
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPdf(orderId);
+            ByteArrayResource resource = new ByteArrayResource(pdfContent);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=order-summary-" + orderId + ".pdf");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(pdfContent.length)
+                    .body(resource);
+        } catch (Exception e) {
+            // Log the exception details (e.g., using a logger)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error generating PDF", e);
+        }
     }
 
 

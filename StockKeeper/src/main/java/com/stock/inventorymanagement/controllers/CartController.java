@@ -108,7 +108,7 @@ public class CartController {
     @GetMapping(value = "/{cartId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateOrderSummaryPdf(@PathVariable Long cartId) {
         try {
-            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPdf(cartId);
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId);
 
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=order_summary_" + cartId + ".pdf")
