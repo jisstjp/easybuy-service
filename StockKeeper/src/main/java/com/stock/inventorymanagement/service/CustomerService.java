@@ -15,4 +15,7 @@ public interface CustomerService {
 
     Page<CustomerDto> searchCustomers( CustomerSearchCriteria searchCriteria,int page, int size);
 
+
+    public CustomerDto getCustomerByUserId(Long userId);
+
 }

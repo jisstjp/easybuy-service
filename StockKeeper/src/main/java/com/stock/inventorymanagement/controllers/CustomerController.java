@@ -78,4 +78,18 @@ public class CustomerController extends BaseController {
 	Page<CustomerDto> customerPage = customerService.searchCustomers(searchCriteria, page, size);
 	return ResponseEntity.ok(customerPage);
     }
+
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<?> getCustomerByUserId(@PathVariable("userId") Long userId) {
+		try {
+			CustomerDto customerDto = customerService.getCustomerByUserId(userId);
+			return ResponseEntity.ok(customerDto);
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.notFound().build();
+		} catch (Exception ex) {
+			ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
+	}
+
 }

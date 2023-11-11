@@ -99,6 +99,11 @@ public class Customer {
     @Column(name = "approval_status")
     private String approvalStatus;
 
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
+
     public Long getId() {
 	return id;
     }
@@ -339,4 +344,11 @@ public class Customer {
 	this.approvalStatus = approvalStatus;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

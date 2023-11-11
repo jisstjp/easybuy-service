@@ -9,10 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import com.stock.inventorymanagement.domain.Customer;
 
+import java.util.Optional;
+
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
     Page<Customer> findAll(Specification<Customer> specification, Pageable pageable);
-    Customer findByEmail(String email); 
+    Customer findByEmail(String email);
+
+    Optional<Customer> findByUserId(Long userId);
 
 }
