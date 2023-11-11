@@ -3,8 +3,10 @@ package com.stock.inventorymanagement.controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.stock.inventorymanagement.service.impl.PdfGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,10 @@ public class CartController {
 
     @Autowired
     private CartItemService cartItemService;
+
+
+    @Autowired
+    private PdfGenerationServiceImpl pdfGenerationService;
 
     @PostMapping("/create")
     public ResponseEntity<CartDto> createCart(@RequestBody Map<String, String> requestBody) {
@@ -97,6 +103,21 @@ public class CartController {
 	    @RequestBody List<CartItemDto> cartItems) {
 	List<CartItemDto> updatedCartItems = cartItemService.updateCartItems(cartId, cartItems);
 	return ResponseEntity.ok(updatedCartItems);
+    }
+
+    @GetMapping(value = "/{cartId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> generateOrderSummaryPdf(@PathVariable Long cartId) {
+        try {
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPdf(cartId);
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=order_summary_" + cartId + ".pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfContent);
+        } catch (Exception e) {
+            // Exception handling can be more specific based on your application's needs
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

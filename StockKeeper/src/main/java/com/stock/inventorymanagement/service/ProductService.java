@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.stock.inventorymanagement.dto.ProductDto;
 import com.stock.inventorymanagement.dto.ProductSearchCriteria;
 
+import java.math.BigDecimal;
+
 public interface ProductService {
 
     ProductDto createProduct(ProductDto productDto, Long userId);
@@ -19,5 +21,9 @@ public interface ProductService {
     Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable);
 
     // void deleteProduct(Long id);
+
+    String getProductNameById(Long productId);
+
+     BigDecimal getSalesPrice(Long productId);
 
 }
