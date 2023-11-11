@@ -177,7 +177,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     @Override
     public byte[] generateOrderSummaryPdf(Long orderId) throws DocumentException {
         OrderDto orderDto = orderService.getOrder(orderId);
-        CustomerDto customerDto = customerService.getCustomerById(orderDto.getUserId());
+        CustomerDto customerDto = customerService.getCustomerByUserId(orderDto.getUserId());
 
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
