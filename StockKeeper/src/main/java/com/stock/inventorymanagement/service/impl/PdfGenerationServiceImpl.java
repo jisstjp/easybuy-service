@@ -198,7 +198,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
         return byteArrayOutputStream.toByteArray();
     }
-
+/*
     private void addHeader(Document document, String companyName, String date) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
         Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
@@ -212,7 +212,35 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         document.add(dateParagraph);
         document.add(Chunk.NEWLINE);
     }
+*/
 
+    private void addHeader(Document document, String companyName, String date) throws DocumentException {
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.DARK_GRAY);
+        Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.GRAY);
+
+        // Create a table for the header with two columns
+        PdfPTable headerTable = new PdfPTable(2);
+        headerTable.setWidthPercentage(100);
+        headerTable.setWidths(new int[]{3, 1});
+
+        // Company name cell
+        PdfPCell companyNameCell = new PdfPCell(new Phrase(companyName, titleFont));
+        companyNameCell.setBorder(Rectangle.NO_BORDER);
+        companyNameCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        companyNameCell.setVerticalAlignment(Element.ALIGN_BOTTOM);
+        headerTable.addCell(companyNameCell);
+
+        // Date cell
+        PdfPCell dateCell = new PdfPCell(new Phrase("Date: " + date, subTitleFont));
+        dateCell.setBorder(Rectangle.NO_BORDER);
+        dateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        dateCell.setVerticalAlignment(Element.ALIGN_BOTTOM);
+        headerTable.addCell(dateCell);
+
+        // Add the table to the document
+        document.add(headerTable);
+        document.add(Chunk.NEWLINE);  // Add a line break after the header
+    }
     private void addCustomerDetails(Document document, CustomerDto customerDto) throws DocumentException {
         Font customerDetailsHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLUE);
         Font customerDetailsFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
