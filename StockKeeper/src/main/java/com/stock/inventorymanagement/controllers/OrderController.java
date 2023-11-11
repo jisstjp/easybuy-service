@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.controllers;
 
 import com.stock.inventorymanagement.dto.OrderDto;
+import com.stock.inventorymanagement.dto.OrderEmailRequestDto;
 import com.stock.inventorymanagement.service.OrderService;
 import com.stock.inventorymanagement.service.impl.PdfGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +78,15 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/send-summary-email")
+    public ResponseEntity<String> sendOrderSummaryEmail(@RequestBody OrderEmailRequestDto orderEmailRequestDto) {
+        try {
+             orderService.generateAndSendOrderPdf(orderEmailRequestDto.getOrderId(), orderEmailRequestDto.getEmail());
+            return ResponseEntity.ok("Order summary email sent successfully to " + orderEmailRequestDto.getEmail());
+        } catch (Exception e) {
+            // Log the exception and return an appropriate error response
+            return ResponseEntity.internalServerError().body("Failed to send order summary email: " + e.getMessage());
+        }
+    }
 
 }

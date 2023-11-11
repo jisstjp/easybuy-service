@@ -11,6 +11,8 @@ import com.stock.inventorymanagement.mapper.OrderItemMapper;
 import com.stock.inventorymanagement.mapper.OrderMapper;
 import com.stock.inventorymanagement.mapper.PaymentMapper;
 import com.stock.inventorymanagement.repository.*;
+import com.stock.inventorymanagement.service.IEmailService;
+import com.stock.inventorymanagement.service.IPdfGenerationService;
 import com.stock.inventorymanagement.service.OrderService;
 import com.stock.inventorymanagement.service.PaymentService;
 import com.stock.inventorymanagement.specification.OrderSpecifications;
@@ -68,6 +70,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private IPdfGenerationService pdfGenerationService;
+
+    @Autowired
+    private IEmailService emailService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -312,6 +320,47 @@ public class OrderServiceImpl implements OrderService {
 
         return orderDto;
 
+    }
+
+    /*
+    public void generateAndSendOrderPdf(Long orderId, String recipientEmail) {
+        try {
+            byte[] pdfBytes = pdfGenerationService.generateOrderSummaryPdf(orderId);
+            String subject = "Order Summary - Order #" + orderId;
+            String body = "Please find attached the summary of your order.";
+            String attachmentFilename = "Order-Summary-" + orderId + ".pdf";
+
+            emailService.sendEmailWithAttachment(recipientEmail, subject, body, attachmentFilename, pdfBytes);
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+        }
+    }
+    *
+     */
+
+    public void generateAndSendOrderPdf(Long orderId, String recipientEmail) {
+        try {
+            byte[] pdfBytes = pdfGenerationService.generateOrderSummaryPdf(orderId);
+            String subject = "Your Order Summary - Order #" + orderId;
+
+            // HTML formatted body
+            String htmlBody = "<html>"
+                    + "<head><style>body { font-family: Arial, sans-serif; }</style></head>"
+                    + "<body>"
+                    + "<h2>Order Summary</h2>"
+                    + "<p>Dear Customer,</p>"
+                    + "<p>Thank you for your purchase. Please find attached the summary of your Order #" + orderId + ".</p>"
+                    + "<p>Should you have any questions or require further assistance, please do not hesitate to contact us.</p>"
+                    + "<br><p>With regards,<br><b>Macolam Team</b></p>"
+                    + "</body>"
+                    + "</html>";
+
+            String attachmentFilename = "Order-Summary-" + orderId + ".pdf";
+
+            emailService.sendEmailWithAttachment(recipientEmail, subject, htmlBody, attachmentFilename, pdfBytes);
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+        }
     }
 
 }

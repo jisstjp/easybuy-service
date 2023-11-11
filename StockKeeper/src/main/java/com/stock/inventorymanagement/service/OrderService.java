@@ -25,4 +25,7 @@ public interface OrderService {
 
     OrderDto getOrder(Long orderId);
 
-}
+     void generateAndSendOrderPdf(Long orderId, String recipientEmail);
+
+
+    }
