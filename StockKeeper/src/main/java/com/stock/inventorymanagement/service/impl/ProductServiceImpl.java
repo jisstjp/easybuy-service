@@ -240,10 +240,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable) {
+    public Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable, boolean isAdminOrManager) {
         Page<Product> productsPage = productDao.searchProducts(searchCriteria, pageable);
         List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
-        return new PageImpl<>(productDtos, pageable, productsPage.getTotalElements());
+        return new PageImpl<>(filterProducts(productDtos,isAdminOrManager), pageable, productsPage.getTotalElements());
 
     }
 
@@ -268,6 +268,25 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Price", "type", "SALES_PRICE for product ID: " + productId));
 
         return BigDecimal.valueOf(salesPrice);
+    }
+
+    public  List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
+// Use Java Stream API to filter products based on user role and retain specified price types
+        return products.stream()
+                .map(product -> {
+                    if (isAdminOrManager) {
+                        return product; // Admins see all prices
+                    } else {
+                        // For non-admins, retain only SALES_PRICE and SUGGESTED_SELLING_PRICE prices
+                        List<PriceDto> filteredPrices = product.getPrices().stream()
+                                .filter(priceDto -> priceDto.getPriceType() == PriceType.SALES_PRICE
+                                        || priceDto.getPriceType() == PriceType.SUGGESTED_SELLING_PRICE)
+                                .collect(Collectors.toList());
+                        product.setPrices(filteredPrices);
+                        return product;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
 

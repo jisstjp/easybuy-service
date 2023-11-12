@@ -3,9 +3,11 @@ package com.stock.inventorymanagement.dao.impl;
 import com.stock.inventorymanagement.dao.ProductDao;
 import com.stock.inventorymanagement.domain.Product;
 import com.stock.inventorymanagement.dto.FieldCriterion;
+import com.stock.inventorymanagement.dto.ProductDto;
 import com.stock.inventorymanagement.dto.ProductSearchCriteria;
 import com.stock.inventorymanagement.dto.SortCriteria;
 import com.stock.inventorymanagement.enums.Operator;
+import com.stock.inventorymanagement.enums.PriceType;
 import com.stock.inventorymanagement.enums.SortDirection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,7 @@ import javax.persistence.criteria.*;
 import javax.persistence.metamodel.ManagedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProductDaoImpl implements ProductDao {
@@ -354,6 +357,9 @@ public class ProductDaoImpl implements ProductDao {
         // Add more types as needed
         throw new IllegalArgumentException("Unsupported field type: " + fieldType);
     }
+
+
+
 
 
 }

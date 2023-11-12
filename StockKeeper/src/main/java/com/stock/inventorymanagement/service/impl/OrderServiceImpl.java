@@ -111,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(savedOrder);
             orderItem.setProductId(cartItem.getProductId());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(safelyFetchSalesPrice(cartItem.getProductId(),cartItem.getPrice()));
+            orderItem.setPrice(safelyFetchSalesPrice(cartItem.getProductId(), cartItem.getPrice()));
             orderItem.setDeleted(false);
             orderItem.setCreatedAt(LocalDateTime.now());
             orderItem.setUpdatedAt(LocalDateTime.now());
@@ -133,7 +133,6 @@ public class OrderServiceImpl implements OrderService {
 
         return totalPrice;
     }
-
 
 
     private BigDecimal calculateTotalPriceFromProduct(Cart cart) {
@@ -169,7 +168,6 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add); // Sum up all the prices
     }
-
 
 
     @Override

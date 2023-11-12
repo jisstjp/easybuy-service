@@ -18,7 +18,7 @@ public interface ProductService {
 
     ProductDto updateProduct(Long id, ProductDto productDto, Long userId);
 
-    Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable);
+    Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable,boolean isAdminOrManager);
 
     // void deleteProduct(Long id);
 

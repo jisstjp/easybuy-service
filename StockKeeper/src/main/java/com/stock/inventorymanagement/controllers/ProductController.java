@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,9 @@ import com.stock.inventorymanagement.exception.ErrorResponse;
 import com.stock.inventorymanagement.exception.InvalidPriceTypeException;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.service.ProductService;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -96,11 +101,12 @@ public class ProductController extends BaseController {
     }
 
     @PostMapping("/search")
-    public Page<ProductDto> searchProducts(@RequestBody ProductSearchCriteria searchCriteria) {
+    public Page<ProductDto> searchProducts(HttpServletRequest request,@RequestBody ProductSearchCriteria searchCriteria,Authentication authentication) {
 	int page = searchCriteria.getPage();
 	int size = searchCriteria.getSize();
 	Pageable pageable = PageRequest.of(page, size);
-	return productService.searchProducts(searchCriteria, pageable);
+	boolean isAdminOrManager = isAdminOrManager(request, authentication);
+	return productService.searchProducts(searchCriteria, pageable,isAdminOrManager);
     }
 
     private Sort getSort(String sort) {

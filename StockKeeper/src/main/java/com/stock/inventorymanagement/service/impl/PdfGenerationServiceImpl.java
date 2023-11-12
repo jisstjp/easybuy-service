@@ -44,7 +44,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             document.open();
 
             // Header with Company Name and Date
-            addHeader(document, "macolam.com", dateFormat.format(new Date()));
+            addHeader(document, "macolam", dateFormat.format(new Date()));
 
             // Fetching Cart and Customer Details
             CartDto cartDto = cartService.getCartById(cartId);
@@ -186,7 +186,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             PdfWriter.getInstance(document, outputStream);
             document.open();
 
-            addCompanyHeader(document, "macolam.com");
+            addCompanyHeader(document, "macolam");
             addOrderHeader(document, orderDto);
             addOrderCustomerDetails(document, customerDto, orderDto);
             addOrderDetails(document, orderDto);
