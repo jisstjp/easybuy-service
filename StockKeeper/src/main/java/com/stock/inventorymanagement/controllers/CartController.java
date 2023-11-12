@@ -3,6 +3,8 @@ package com.stock.inventorymanagement.controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.stock.inventorymanagement.dto.CartEmailRequestDto;
+import com.stock.inventorymanagement.service.IEmailService;
 import com.stock.inventorymanagement.service.impl.PdfGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -117,6 +119,17 @@ public class CartController {
         } catch (Exception e) {
             // Exception handling can be more specific based on your application's needs
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/send-cart-summary-email")
+    public ResponseEntity<String> sendCartSummaryEmail(@RequestBody CartEmailRequestDto cartEmailRequestDto) {
+        try {
+            cartService.generateAndSendCartPdf(cartEmailRequestDto.getCartId(), cartEmailRequestDto.getEmail());
+            return ResponseEntity.ok("Cart summary email sent successfully to " + cartEmailRequestDto.getEmail());
+        } catch (Exception e) {
+            // Log the exception and return an appropriate error response
+            return ResponseEntity.internalServerError().body("Failed to send cart summary email: " + e.getMessage());
         }
     }
 

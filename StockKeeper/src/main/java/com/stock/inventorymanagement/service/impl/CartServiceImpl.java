@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.stock.inventorymanagement.service.IEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +18,9 @@ import com.stock.inventorymanagement.mapper.CartMapper;
 import com.stock.inventorymanagement.repository.CartRepository;
 import com.stock.inventorymanagement.repository.UserRepository;
 import com.stock.inventorymanagement.service.CartService;
+
+import javax.mail.MessagingException;
+
 @Service
 public class CartServiceImpl implements CartService {
 
@@ -27,6 +31,12 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PdfGenerationServiceImpl pdfGenerationService;
+
+    @Autowired
+    private IEmailService emailService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -66,6 +76,26 @@ public class CartServiceImpl implements CartService {
 
       cart.setDeleted(true);
         cartRepository.save(cart);
+    }
+
+    public void generateAndSendCartPdf(Long cartId, String recipientEmail) throws MessagingException, MessagingException {
+        try {
+            // Generate PDF content for the cart
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId);
+
+            // Define the filename for the PDF attachment
+            String attachmentFilename = "cart_summary_" + cartId + ".pdf";
+
+            // Define the subject and body of the email
+            String subject = "Cart Summary";
+            String body = "Please find attached the summary of your cart.";
+
+            // Send the email with the PDF attachment
+            emailService.sendEmailWithAttachment(recipientEmail, subject, body, attachmentFilename, pdfContent);
+        }catch (Exception e) {
+            throw e;
+            // Handle exceptions appropriately
+        }
     }
 
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.stock.inventorymanagement.dto.CartDto;
 
+import javax.mail.MessagingException;
+
 public interface CartService {
 
     CartDto createCart(Long userId);
@@ -13,5 +15,6 @@ public interface CartService {
     List<CartDto> getCartsByUserId(Long userId);
 
     void deleteCart(Long cartId);
+    public void generateAndSendCartPdf(Long cartId, String recipientEmail) throws MessagingException;
 
 }

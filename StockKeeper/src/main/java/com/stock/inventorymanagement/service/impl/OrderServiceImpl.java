@@ -1,5 +1,6 @@
 package com.stock.inventorymanagement.service.impl;
 
+import com.itextpdf.text.DocumentException;
 import com.stock.inventorymanagement.domain.*;
 import com.stock.inventorymanagement.dto.OrderDto;
 import com.stock.inventorymanagement.dto.OrderItemDto;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -339,7 +342,7 @@ public class OrderServiceImpl implements OrderService {
     *
      */
 
-    public void generateAndSendOrderPdf(Long orderId, String recipientEmail) {
+    public void generateAndSendOrderPdf(Long orderId, String recipientEmail) throws MessagingException, DocumentException, IOException {
         try {
             byte[] pdfBytes = pdfGenerationService.generateOrderSummaryPdf(orderId);
             String subject = "Your Order Summary - Order #" + orderId;
@@ -360,6 +363,7 @@ public class OrderServiceImpl implements OrderService {
 
             emailService.sendEmailWithAttachment(recipientEmail, subject, htmlBody, attachmentFilename, pdfBytes);
         } catch (Exception e) {
+            throw e;
             // Handle exceptions appropriately
         }
     }

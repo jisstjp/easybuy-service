@@ -1,10 +1,14 @@
 package com.stock.inventorymanagement.service;
 
+import com.itextpdf.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.stock.inventorymanagement.dto.OrderDto;
 import com.stock.inventorymanagement.dto.OrderSearchCriteria;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
 
 public interface OrderService {
 
@@ -25,7 +29,7 @@ public interface OrderService {
 
     OrderDto getOrder(Long orderId);
 
-     void generateAndSendOrderPdf(Long orderId, String recipientEmail);
+     void generateAndSendOrderPdf(Long orderId, String recipientEmail) throws MessagingException, DocumentException, IOException;
 
 
     }
