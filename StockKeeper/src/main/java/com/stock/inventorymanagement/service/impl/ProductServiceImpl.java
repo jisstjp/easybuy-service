@@ -243,7 +243,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductDto> searchProducts(ProductSearchCriteria searchCriteria, Pageable pageable, boolean isAdminOrManager) {
         Page<Product> productsPage = productDao.searchProducts(searchCriteria, pageable);
         List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
-        return new PageImpl<>(filterProducts(productDtos,isAdminOrManager), pageable, productsPage.getTotalElements());
+        return new PageImpl<>(filterProducts(productDtos, isAdminOrManager), pageable, productsPage.getTotalElements());
 
     }
 
@@ -270,7 +270,7 @@ public class ProductServiceImpl implements ProductService {
         return BigDecimal.valueOf(salesPrice);
     }
 
-    public  List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
+    public List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
 // Use Java Stream API to filter products based on user role and retain specified price types
         return products.stream()
                 .map(product -> {
@@ -288,6 +288,5 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
     }
-
 
 }
