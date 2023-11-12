@@ -248,13 +248,18 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         PdfPTable table = new PdfPTable(new float[]{3, 1, 2, 2});
         table.setWidthPercentage(100);
 
-        // Adding table headers with a light gray background
+        // Define colors
+        BaseColor lightGray = new BaseColor(220, 220, 220);
+        BaseColor darkGray = BaseColor.BLACK;
+
+        // Adding table headers with light gray background and bold, dark font
         Stream.of("Product Name", "Quantity", "Price per Item", "Subtotal")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
-                    header.setBackgroundColor(new BaseColor(192, 192, 192)); // Set background color to light gray
-                    header.setBorderWidth(2);
-                    header.setPhrase(new Phrase(columnTitle, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK))); // Set font color to black
+                    header.setBackgroundColor(lightGray);
+                    header.setBorderWidth(1); // Light gray border
+                    Phrase phrase = new Phrase(columnTitle, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, darkGray));
+                    header.setPhrase(phrase);
                     table.addCell(header);
                 });
 
@@ -266,10 +271,23 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             BigDecimal price = safelyFetchSalesPrice(item.getProductId(), item.getPrice());
             BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
 
-            table.addCell(new Phrase(productName, new Font(Font.FontFamily.HELVETICA, 12)));
-            table.addCell(new Phrase(String.valueOf(item.getQuantity()), new Font(Font.FontFamily.HELVETICA, 12)));
-            table.addCell(new Phrase("$" + price.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
-            table.addCell(new Phrase("$" + lineTotal.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
+            // Create content cells with light gray borders
+            PdfPCell productNameCell = new PdfPCell(new Phrase(productName, new Font(Font.FontFamily.HELVETICA, 12)));
+            PdfPCell quantityCell = new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), new Font(Font.FontFamily.HELVETICA, 12)));
+            PdfPCell priceCell = new PdfPCell(new Phrase("$" + price.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
+            PdfPCell lineTotalCell = new PdfPCell(new Phrase("$" + lineTotal.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
+
+            // Set light gray borders for content cells
+            productNameCell.setBorderColor(lightGray);
+            quantityCell.setBorderColor(lightGray);
+            priceCell.setBorderColor(lightGray);
+            lineTotalCell.setBorderColor(lightGray);
+
+            // Add content cells to the table
+            table.addCell(productNameCell);
+            table.addCell(quantityCell);
+            table.addCell(priceCell);
+            table.addCell(lineTotalCell);
 
             total = total.add(lineTotal);
         }
@@ -279,6 +297,9 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         document.add(new Paragraph("Total Cost: $" + total.toPlainString(), new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
         document.add(Chunk.NEWLINE);
     }
+
+
+
 
     private BigDecimal safelyFetchSalesPrice(Long productId, BigDecimal fallbackPrice) {
         try {
