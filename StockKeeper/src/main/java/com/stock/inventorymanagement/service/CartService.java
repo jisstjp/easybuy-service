@@ -15,6 +15,6 @@ public interface CartService {
     List<CartDto> getCartsByUserId(Long userId);
 
     void deleteCart(Long cartId);
-    public void generateAndSendCartPdf(Long cartId, String recipientEmail) throws MessagingException;
+    public void generateAndSendCartPdf(Long cartId, String recipientEmail,Long userId,boolean isAdminOrManager) throws MessagingException;
 
 }

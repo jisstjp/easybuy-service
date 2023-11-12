@@ -342,9 +342,9 @@ public class OrderServiceImpl implements OrderService {
     *
      */
 
-    public void generateAndSendOrderPdf(Long orderId, String recipientEmail) throws MessagingException, DocumentException, IOException {
+    public void generateAndSendOrderPdf(Long orderId, String recipientEmail,Long userId,boolean isAdminOrManager) throws MessagingException, DocumentException, IOException {
         try {
-            byte[] pdfBytes = pdfGenerationService.generateOrderSummaryPdf(orderId);
+            byte[] pdfBytes = pdfGenerationService.generateOrderSummaryPdf(orderId,userId,isAdminOrManager);
             String subject = "Your Order Summary - Order #" + orderId;
 
             // HTML formatted body

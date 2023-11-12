@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.stock.inventorymanagement.dto.*;
+import com.stock.inventorymanagement.exception.UnauthorizedException;
 import com.stock.inventorymanagement.service.IPdfGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -44,7 +45,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     private ResourceLoader resourceLoader;
 
     @Override
-    public byte[] generateOrderSummaryPreviewPdf(Long cartId) {
+    public byte[] generateOrderSummaryPreviewPdf(Long cartId, Long userId, boolean isAdminOrManager)  throws UnauthorizedException  {
         Document document = new Document();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -58,8 +59,12 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
             // Fetching Cart and Customer Details
             CartDto cartDto = cartService.getCartById(cartId);
-            Long userId = cartDto.getUserId();
-            CustomerDto customerDto = customerService.getCustomerById(userId);
+            Long cartUserId = cartDto.getUserId();
+            if (!userId.equals(cartUserId) && !isAdminOrManager) {
+                throw new UnauthorizedException("You are not authorized for this operation");
+            }
+
+            CustomerDto customerDto = customerService.getCustomerById(cartUserId);
 
             // Beautified Customer Details
             addCustomerDetails(document, customerDto);
@@ -70,7 +75,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             // Footer
             addFooter(document);
 
-        } catch (DocumentException e) {
+        }  catch (DocumentException e) {
             throw new RuntimeException("Error while generating PDF", e);
         } finally {
             document.close();
@@ -110,7 +115,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
      */
 
-    private  void addHeader(Document document, String companyName, String date) throws DocumentException {
+    private void addHeader(Document document, String companyName, String date) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.DARK_GRAY);
         Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.GRAY);
 
@@ -315,9 +320,15 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
 
     @Override
-    public byte[] generateOrderSummaryPdf(Long orderId) throws DocumentException, IOException {
+    public byte[] generateOrderSummaryPdf(Long orderId, Long userId, boolean isAdminOrManager) throws DocumentException, IOException {
         OrderDto orderDto = orderService.getOrder(orderId);
+        //Check if the userId is the same as the JWT user id and if the user is an admin
+        if (!userId.equals(orderDto.getUserId()) && !isAdminOrManager) {
+            throw new UnauthorizedException("You are not authorized for this operation");
+        }
+
         CustomerDto customerDto = customerService.getCustomerByUserId(orderDto.getUserId());
+
 
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

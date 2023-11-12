@@ -78,10 +78,10 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-    public void generateAndSendCartPdf(Long cartId, String recipientEmail) throws MessagingException, MessagingException {
+    public void generateAndSendCartPdf(Long cartId, String recipientEmail,Long userId,boolean isAdminOrManager) throws MessagingException, MessagingException {
         try {
             // Generate PDF content for the cart
-            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId);
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId,userId,isAdminOrManager);
 
             // Define the filename for the PDF attachment
             String attachmentFilename = "cart_summary_" + cartId + ".pdf";

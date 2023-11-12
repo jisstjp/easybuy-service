@@ -29,7 +29,7 @@ public interface OrderService {
 
     OrderDto getOrder(Long orderId);
 
-     void generateAndSendOrderPdf(Long orderId, String recipientEmail) throws MessagingException, DocumentException, IOException;
+     void generateAndSendOrderPdf(Long orderId, String recipientEmail,Long userId,boolean isAdminOrManager) throws MessagingException, DocumentException, IOException;
 
 
     }

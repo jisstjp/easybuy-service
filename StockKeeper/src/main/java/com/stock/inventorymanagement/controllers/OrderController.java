@@ -12,12 +12,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/users/{userId}/orders")
-public class OrderController {
+public class OrderController extends BaseController {
     @Autowired
     private OrderService orderService;
 
@@ -60,9 +63,11 @@ public class OrderController {
 
 
     @GetMapping("/{orderId}/pdf")
-    public ResponseEntity<ByteArrayResource> getOrderPdf(@PathVariable Long userId, @PathVariable Long orderId) {
+    public ResponseEntity<ByteArrayResource> getOrderPdf(HttpServletRequest request, Authentication authentication,@PathVariable Long userId, @PathVariable Long orderId) {
         try {
-            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPdf(orderId);
+            boolean isAdminOrManager = isAdminOrManager(request, authentication);
+            Long JwtUserId = getUserIdFromToken(request);
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPdf(orderId,JwtUserId,isAdminOrManager);
             ByteArrayResource resource = new ByteArrayResource(pdfContent);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=order-summary-" + orderId + ".pdf");
@@ -79,9 +84,11 @@ public class OrderController {
     }
 
     @PostMapping("/send-summary-email")
-    public ResponseEntity<String> sendOrderSummaryEmail(@RequestBody OrderEmailRequestDto orderEmailRequestDto) {
+    public ResponseEntity<String> sendOrderSummaryEmail(HttpServletRequest request, Authentication authentication,@RequestBody OrderEmailRequestDto orderEmailRequestDto) {
         try {
-             orderService.generateAndSendOrderPdf(orderEmailRequestDto.getOrderId(), orderEmailRequestDto.getEmail());
+            boolean isAdminOrManager = isAdminOrManager(request, authentication);
+            Long userId = getUserIdFromToken(request);
+             orderService.generateAndSendOrderPdf(orderEmailRequestDto.getOrderId(), orderEmailRequestDto.getEmail(),userId,isAdminOrManager);
             return ResponseEntity.ok("Order summary email sent successfully to " + orderEmailRequestDto.getEmail());
         } catch (Exception e) {
             // Log the exception and return an appropriate error response

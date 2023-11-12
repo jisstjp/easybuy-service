@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +24,11 @@ import com.stock.inventorymanagement.dto.CartItemDto;
 import com.stock.inventorymanagement.service.CartItemService;
 import com.stock.inventorymanagement.service.CartService;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/carts")
-public class CartController {
+public class CartController extends BaseController {
 
     @Autowired
     private CartService cartService;
@@ -108,10 +111,11 @@ public class CartController {
     }
 
     @GetMapping(value = "/{cartId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> generateOrderSummaryPdf(@PathVariable Long cartId) {
+    public ResponseEntity<byte[]> generateOrderSummaryPdf(HttpServletRequest request, Authentication authentication,@PathVariable Long cartId) {
         try {
-            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId);
-
+            boolean isAdminOrManager = isAdminOrManager(request, authentication);
+            Long userId = getUserIdFromToken(request);
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId,userId,isAdminOrManager);
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=order_summary_" + cartId + ".pdf")
                     .contentType(MediaType.APPLICATION_PDF)
@@ -123,9 +127,11 @@ public class CartController {
     }
 
     @PostMapping("/send-cart-summary-email")
-    public ResponseEntity<String> sendCartSummaryEmail(@RequestBody CartEmailRequestDto cartEmailRequestDto) {
+    public ResponseEntity<String> sendCartSummaryEmail(HttpServletRequest request, Authentication authentication,@RequestBody CartEmailRequestDto cartEmailRequestDto) {
         try {
-            cartService.generateAndSendCartPdf(cartEmailRequestDto.getCartId(), cartEmailRequestDto.getEmail());
+            boolean isAdminOrManager = isAdminOrManager(request, authentication);
+            Long userId = getUserIdFromToken(request);
+            cartService.generateAndSendCartPdf(cartEmailRequestDto.getCartId(), cartEmailRequestDto.getEmail(),userId,isAdminOrManager);
             return ResponseEntity.ok("Cart summary email sent successfully to " + cartEmailRequestDto.getEmail());
         } catch (Exception e) {
             // Log the exception and return an appropriate error response
