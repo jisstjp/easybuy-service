@@ -12,9 +12,9 @@ public interface ProductService {
 
     ProductDto createProduct(ProductDto productDto, Long userId);
 
-    ProductDto getProductById(Long id);
+    ProductDto getProductById(Long id,boolean isAdminOrManager);
 
-    Page<ProductDto> getAllProducts(Pageable pageable);
+    Page<ProductDto> getAllProducts(Pageable pageable,boolean isAdminOrManager);
 
     ProductDto updateProduct(Long id, ProductDto productDto, Long userId);
 

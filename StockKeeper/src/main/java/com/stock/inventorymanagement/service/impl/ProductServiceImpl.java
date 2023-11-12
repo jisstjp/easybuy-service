@@ -223,19 +223,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProductById(Long id) {
+    public ProductDto getProductById(Long id,boolean isAdminOrManager) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
-        return productMapper.toDto(product);
+        return  filterProduct(productMapper.toDto(product),isAdminOrManager);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductDto> getAllProducts(Pageable pageable) {
+    public Page<ProductDto> getAllProducts(Pageable pageable,boolean isAdminOrManager) {
         Page<Product> productsPage = productRepository.findAll(pageable);
         List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
-        return new PageImpl<>(productDtos, pageable, productsPage.getTotalElements());
+        return new PageImpl<>(filterProducts(productDtos,isAdminOrManager), pageable, productsPage.getTotalElements());
     }
 
     @Override
@@ -270,7 +270,7 @@ public class ProductServiceImpl implements ProductService {
         return BigDecimal.valueOf(salesPrice);
     }
 
-    public List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
+    private  List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
 // Use Java Stream API to filter products based on user role and retain specified price types
         return products.stream()
                 .map(product -> {
@@ -287,6 +287,17 @@ public class ProductServiceImpl implements ProductService {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    private ProductDto filterProduct(ProductDto product, boolean isAdminOrManager) {
+        if (!isAdminOrManager) {
+            List<PriceDto> filteredPrices = product.getPrices().stream()
+                    .filter(priceDto -> priceDto.getPriceType() == PriceType.SALES_PRICE
+                            || priceDto.getPriceType() == PriceType.SUGGESTED_SELLING_PRICE)
+                    .collect(Collectors.toList());
+            product.setPrices(filteredPrices);
+        }
+        return product;
     }
 
 }
