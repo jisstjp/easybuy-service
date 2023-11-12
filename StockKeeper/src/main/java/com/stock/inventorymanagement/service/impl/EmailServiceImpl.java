@@ -2,6 +2,7 @@ package com.stock.inventorymanagement.service.impl;
 
 import com.stock.inventorymanagement.service.IEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,12 +17,15 @@ public class EmailServiceImpl implements IEmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+    private String fromAddress;
+
     @Override
     public void sendEmailWithAttachment(String to, String subject, String htmlBody, String attachmentFilename, byte[] attachmentData) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
-        helper.setFrom("your-email@gmail.com");
+        helper.setFrom(fromAddress); // Use the loaded property here
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlBody, true); // Set to 'true' to enable HTML content
