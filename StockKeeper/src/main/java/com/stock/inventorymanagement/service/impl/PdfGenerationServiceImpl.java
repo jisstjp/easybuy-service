@@ -64,7 +64,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
                 throw new UnauthorizedException("You are not authorized for this operation");
             }
 
-            CustomerDto customerDto = customerService.getCustomerById(cartUserId);
+            CustomerDto customerDto = customerService.getCustomerByUserId(cartUserId);
 
             // Beautified Customer Details
             addCustomerDetails(document, customerDto);
