@@ -41,7 +41,7 @@ public class BaseController {
                 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
                 return authorities.stream()
                         .map(GrantedAuthority::getAuthority)
-                        .anyMatch(authority -> authority.equals("ROLE_ADMIN") || authority.equals("ROLE_MANAGER"));
+                        .anyMatch(authority -> authority.equalsIgnoreCase("ROLE_ADMIN") || authority.equalsIgnoreCase("ROLE_MANAGER"));
             }
         }
         return false; // If authentication is not available or user has no matching authority
