@@ -1,5 +1,8 @@
 package com.stock.inventorymanagement.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+
 public class CartEmailRequestDto {
     private Long cartId;
     private String email;

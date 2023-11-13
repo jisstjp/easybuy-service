@@ -1,7 +1,8 @@
 package com.stock.inventorymanagement.dto;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigDecimal;
 public class CustomerDto {
     private Long id;
     private String firstName;
