@@ -96,6 +96,7 @@ public class CustomerController extends BaseController {
         customerInfoDto.setZipPostalCode(customer.getZipPostalCode());
         customerInfoDto.setCountry(customer.getCountry());
         customerInfoDto.setEmail(customer.getEmail());
+        customerInfoDto.setCompany(customer.getCompany());
         // Handle nullable fields
         if (customer.getPhone() != null) {
             customerInfoDto.setPhone(customer.getPhone());

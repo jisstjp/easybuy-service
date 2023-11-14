@@ -11,6 +11,7 @@ public class CustomerInfoDto {
     private String country;
     private String email;
     private String phone;
+    private String company;
 
     public String getFirstName() {
         return firstName;
@@ -90,5 +91,13 @@ public class CustomerInfoDto {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 }
