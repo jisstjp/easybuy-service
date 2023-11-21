@@ -26,4 +26,6 @@ public interface ProductService {
 
      BigDecimal getSalesPrice(Long productId);
 
+    BigDecimal getSuggestedPrice(Long productId);
+
 }

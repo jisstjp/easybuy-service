@@ -270,6 +270,22 @@ public class ProductServiceImpl implements ProductService {
         return BigDecimal.valueOf(salesPrice);
     }
 
+
+    @Transactional(readOnly = true)
+    public BigDecimal getSuggestedPrice(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+
+        Double suggestedPrice  = product.getPrices().stream()
+                .filter(price -> price.getPriceType() == PriceType.SUGGESTED_SELLING_PRICE && !price.isDeleted())
+                .map(Price::getPrice)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Price", "type", "SUGGESTED_SELLING_PRICE for product ID: " + productId));
+
+        return BigDecimal.valueOf(suggestedPrice);
+    }
+
+
     private  List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
 // Use Java Stream API to filter products based on user role and retain specified price types
         return products.stream()
