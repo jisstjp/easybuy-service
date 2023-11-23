@@ -36,6 +36,9 @@ public class ProductServiceImpl implements ProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private SubcategoryRepository subcategoryRepository;
+
+    @Autowired
+    private DistributorRepository distributorRepository;
     @Autowired
     private ProductMapper productMapper;
     @Autowired
@@ -88,6 +91,14 @@ public class ProductServiceImpl implements ProductService {
             product.setSubcategory(subcategory);
         }
 
+        DistributorDto distributorDto = productDto.getDistributor();
+        if (distributorDto != null && distributorDto.getId() != null) {
+            Distributor distributor = distributorRepository.findById(distributorDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Distributor", "id", distributorDto.getId()));
+            product.setDistributor(distributor);
+        }
+
+
         product.setIsDeleted(false);
 
         Product savedProduct = productRepository.save(product);
@@ -136,6 +147,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setIsAvailable(productDto.getIsAvailable());
         existingProduct.setBarCode(productDto.getBarCode());
         existingProduct.setFlavor(productDto.getFlavor());
+        existingProduct.setProductDiscontinued(productDto.getProductDiscontinued());
 
         // Update other fields as needed
 
@@ -172,6 +184,14 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new ResourceNotFoundException("Subcategory", "id", subcategoryDto.getId()));
             existingProduct.setSubcategory(subcategory);
         }
+
+        DistributorDto distributorDto = productDto.getDistributor();
+        if (distributorDto != null && distributorDto.getId() != null) {
+            Distributor distributor = distributorRepository.findById(distributorDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Distributor", "id", distributorDto.getId()));
+            existingProduct.setDistributor(distributor);
+        }
+
 
         // Save the updated product
         List<Price> existingPrices = existingProduct.getPrices();
@@ -223,19 +243,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProductById(Long id,boolean isAdminOrManager) {
+    public ProductDto getProductById(Long id, boolean isAdminOrManager) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
-        return  filterProduct(productMapper.toDto(product),isAdminOrManager);
+        return filterProduct(productMapper.toDto(product), isAdminOrManager);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductDto> getAllProducts(Pageable pageable,boolean isAdminOrManager) {
+    public Page<ProductDto> getAllProducts(Pageable pageable, boolean isAdminOrManager) {
         Page<Product> productsPage = productRepository.findAll(pageable);
         List<ProductDto> productDtos = productsPage.map(productMapper::toDto).toList();
-        return new PageImpl<>(filterProducts(productDtos,isAdminOrManager), pageable, productsPage.getTotalElements());
+        return new PageImpl<>(filterProducts(productDtos, isAdminOrManager), pageable, productsPage.getTotalElements());
     }
 
     @Override
@@ -276,7 +296,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
 
-        Double suggestedPrice  = product.getPrices().stream()
+        Double suggestedPrice = product.getPrices().stream()
                 .filter(price -> price.getPriceType() == PriceType.SUGGESTED_SELLING_PRICE && !price.isDeleted())
                 .map(Price::getPrice)
                 .findFirst()
@@ -286,7 +306,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private  List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
+    private List<ProductDto> filterProducts(List<ProductDto> products, boolean isAdminOrManager) {
 // Use Java Stream API to filter products based on user role and retain specified price types
         return products.stream()
                 .map(product -> {

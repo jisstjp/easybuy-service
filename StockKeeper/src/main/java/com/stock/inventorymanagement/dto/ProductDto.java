@@ -15,6 +15,7 @@ public class ProductDto {
     private BrandDto brand;
     private CategoryDto category;
     private SubcategoryDto subcategory;
+    private DistributorDto distributor;
     private List<PriceDto> prices;
     private String sku;
     private BigDecimal price;
@@ -29,6 +30,8 @@ public class ProductDto {
     private String barCode;
     private String flavor;
     private Boolean isAvailable = true;
+
+    private Boolean productDiscontinued;
 
     public Long getId() {
 	return id;
@@ -198,4 +201,27 @@ public class ProductDto {
 	this.flavor = flavor;
     }
 
+    public DistributorDto getDistributor() {
+        return distributor;
+    }
+
+    public void setDistributor(DistributorDto distributor) {
+        this.distributor = distributor;
+    }
+
+    public Boolean getAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+    }
+
+    public Boolean getProductDiscontinued() {
+        return productDiscontinued;
+    }
+
+    public void setProductDiscontinued(Boolean productDiscontinued) {
+        this.productDiscontinued = productDiscontinued;
+    }
 }

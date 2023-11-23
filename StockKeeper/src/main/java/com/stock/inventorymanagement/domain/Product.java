@@ -89,6 +89,13 @@ public class Product {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Column(name = "product_discontinued")
+    private Boolean productDiscontinued;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "distributor_id")
+    private Distributor distributor;
+
     public Long getId() {
 	return id;
     }
@@ -281,4 +288,35 @@ public class Product {
 	this.flavor = flavor;
     }
 
+    public Boolean getAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public Boolean getProductDiscontinued() {
+        return productDiscontinued;
+    }
+
+    public void setProductDiscontinued(Boolean productDiscontinued) {
+        this.productDiscontinued = productDiscontinued;
+    }
+
+    public Distributor getDistributor() {
+        return distributor;
+    }
+
+    public void setDistributor(Distributor distributor) {
+        this.distributor = distributor;
+    }
 }
