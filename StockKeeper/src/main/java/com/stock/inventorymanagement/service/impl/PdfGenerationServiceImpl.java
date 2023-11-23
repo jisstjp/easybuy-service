@@ -56,7 +56,9 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
 
             // Header with Company Name and Date
-            addHeader(document, "macolam", dateFormat.format(new Date()));
+            addHeader(document);
+
+            addProformaInvoiceTitle(document);
 
             // Fetching Cart and Customer Details
             CartDto cartDto = cartService.getCartById(cartId);
@@ -87,62 +89,56 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
 
 
-    private void addHeader(Document document, String companyName, String dateTime) throws DocumentException {
+    private void addHeader(Document document) throws DocumentException {
         try {
-            // Assuming the logo is stored in the resources directory of your project
+            // Load the company logo
             Image logo = Image.getInstance(getClass().getResource("/images/macolam.logo.png"));
-            logo.scaleToFit(50, 50); // Adjust the size of the logo as needed
+            // Calculate the new width to maintain the aspect ratio
+            float scaler = 80 / logo.getHeight(); // Assuming you want the height to be 80 units
+            logo.scaleAbsoluteHeight(80);
+            logo.scaleAbsoluteWidth(logo.getWidth() * scaler);
 
-            // Create a table for the header with 3 columns
-            PdfPTable headerTable = new PdfPTable(new float[]{1, 4, 2});
-            headerTable.setWidthPercentage(100); // Set width to 100% of the page
+            // Create a table with a single column for the logo to be left-aligned
+            PdfPTable headerTable = new PdfPTable(1);
+            headerTable.setWidthPercentage(100); // Set the table width to 100% of the page width
+            headerTable.setHorizontalAlignment(Element.ALIGN_LEFT); // Align the table to the left
 
-            // Add logo to the first cell with padding for a cleaner look
+            // Create a cell for the logo with no border
             PdfPCell logoCell = new PdfPCell(logo, false);
             logoCell.setBorder(Rectangle.NO_BORDER);
             logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             logoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            logoCell.setPaddingLeft(10);
-            logoCell.setPaddingTop(10);
+            logoCell.setPaddingLeft(5);
+            logoCell.setPaddingTop(5); // Adjust padding as needed
             headerTable.addCell(logoCell);
 
-            // Add a blank cell as a spacer
-            PdfPCell spacerCell = new PdfPCell();
-            spacerCell.setBorder(Rectangle.NO_BORDER);
-            spacerCell.setColspan(2); // Span across the rest of the row
-            headerTable.addCell(spacerCell);
-
-            // Add company name and date in the last cell, with custom fonts and alignment
-            PdfPCell textCell = new PdfPCell();
-            textCell.setBorder(Rectangle.NO_BORDER);
-            textCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            textCell.setVerticalAlignment(Element.ALIGN_BOTTOM);
-            textCell.setPaddingRight(10);
-
-            // Custom fonts for company name and date
-            Font companyNameFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-            Font dateTimeFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
-
-            // Add company name and date to the cell
-            Paragraph textParagraph = new Paragraph();
-            textParagraph.add(new Phrase(companyName.toUpperCase() + "\n", companyNameFont)); // Company name in uppercase
-            textParagraph.add(new Phrase(dateTime, dateTimeFont)); // Date in a smaller font
-            textParagraph.setAlignment(Element.ALIGN_RIGHT);
-            textCell.addElement(textParagraph);
-
-            // Adjust cell padding to position the text nicely
-            textCell.setPaddingTop(logo.getScaledHeight() - textParagraph.getFont().getSize()); // Align text top with logo top
-
-            headerTable.addCell(textCell);
-
-            // Add the complete header table to the document
             document.add(headerTable);
-
-            // Add a spacer paragraph for more space below the header
-            document.add(new Paragraph(" "));
         } catch (BadElementException | IOException ex) {
             throw new DocumentException("Error adding header: " + ex.getMessage(), ex);
         }
+    }
+
+
+
+
+    private void addProformaInvoiceTitle(Document document) throws DocumentException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+        String currentDate = dateFormat.format(new Date());
+
+        // Add the "Proforma Invoice" title
+        Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph("Proforma Invoice", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+
+        // Add the date below the title
+        Font dateFont = new Font(Font.FontFamily.HELVETICA, 12);
+        Paragraph dateParagraph = new Paragraph(currentDate, dateFont);
+        dateParagraph.setAlignment(Element.ALIGN_CENTER);
+        document.add(dateParagraph);
+
+        // Add a spacer to provide some space after the title
+        document.add(new Paragraph(" "));
     }
 
 
@@ -172,6 +168,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     }
 
 
+    /*
     private void addCartItems(Document document, Long cartId) throws DocumentException {
         List<CartItemDto> cartItems = cartItemService.getCartItemsByCartId(cartId);
         PdfPTable table = new PdfPTable(new float[]{3f, 1.2f, 2f, 2f, 3f}); // Append 'f' to make the numbers float literals // Adjust column widths for the new header
@@ -218,6 +215,61 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         cell.setHorizontalAlignment(alignment);
         cell.setPadding(3); // Add padding for a neat layout
         cell.setBorderWidth(0.5f); // Set a subtle border width
+        table.addCell(cell);
+    }
+
+    */
+
+
+    private void addCartItems(Document document, Long cartId) throws DocumentException {
+        List<CartItemDto> cartItems = cartItemService.getCartItemsByCartId(cartId);
+        PdfPTable table = new PdfPTable(new float[]{3f, 1.8f, 3f, 3f, 3f});
+        table.setWidthPercentage(100);
+
+        // Define table headers with improved and lighter styling
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        BaseColor headerBackgroundColor = new BaseColor(245, 245, 245); // Very light gray for a softer appearance
+
+        Stream.of("Product Name", "Quantity", "Price per Item", "Subtotal", "Suggested Price per Item")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell(new Phrase(columnTitle, headerFont));
+                    header.setBackgroundColor(headerBackgroundColor);
+                    header.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    header.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    header.setPadding(8);
+                    table.addCell(header);
+                });
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        // Adding cart items with enhanced styling
+        for (CartItemDto item : cartItems) {
+            String productName = productService.getProductNameById(item.getProductId());
+            BigDecimal price = safelyFetchSalesPrice(item.getProductId(), item.getPrice());
+            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), price);
+            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
+
+            // Add product details to the table with improved styling
+            addTableCell(table, productName, Element.ALIGN_LEFT);
+            addTableCell(table, String.valueOf(item.getQuantity()), Element.ALIGN_CENTER);
+            addTableCell(table, "$" + price.toPlainString(), Element.ALIGN_RIGHT);
+            addTableCell(table, "$" + lineTotal.toPlainString(), Element.ALIGN_RIGHT);
+            addTableCell(table, "$" + suggestedPrice.toPlainString(), Element.ALIGN_RIGHT);
+
+            total = total.add(lineTotal);
+        }
+
+        document.add(table);
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph("Total Cost: $" + total.toPlainString(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+        document.add(Chunk.NEWLINE);
+    }
+
+    private void addTableCell(PdfPTable table, String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, FontFactory.getFont(FontFactory.HELVETICA, 10)));
+        cell.setHorizontalAlignment(alignment);
+        cell.setPadding(5);
+        cell.setBorderWidth(0.5f);
         table.addCell(cell);
     }
 
@@ -297,7 +349,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             PdfWriter.getInstance(document, outputStream);
             document.open();
 
-            addCompanyHeader(document, "macolam");
+            addCompanyHeader(document);
             addOrderHeader(document, orderDto);
             addOrderCustomerDetails(document, customerDto, orderDto);
             addOrderDetails(document, orderDto);
@@ -313,127 +365,131 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         }
     }
 
-/*
-    private void addCompanyHeader(Document document, String companyName) throws DocumentException, IOException {
-        // Format the current date and time
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
-        String formattedDate = dateFormat.format(new Date());
 
-        // Create a table for the header with three columns
-        PdfPTable headerTable = new PdfPTable(2); // Two columns for logo and company name with date
-        headerTable.setWidthPercentage(100);
 
-        // Load the company logo image using ClassPathResource
-        ClassPathResource logoResource = new ClassPathResource("/images/macolam.logo.png");
-        Path logoPath = Files.createTempFile("logo", ".png");
-        Files.copy(logoResource.getInputStream(), logoPath, StandardCopyOption.REPLACE_EXISTING);
-        Image logoImage = Image.getInstance(logoPath.toAbsolutePath().toString());
-        logoImage.scaleToFit(50, 50); // Adjust the size of the logo as needed
-        PdfPCell logoCell = new PdfPCell(logoImage, false);
-        logoCell.setBorder(Rectangle.NO_BORDER);
-        logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-        logoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        logoCell.setPaddingLeft(10);
-        logoCell.setPaddingTop(10);
-        headerTable.addCell(logoCell);
+    private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
+        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
-        // Combine the company name and date into one cell and align it to the right
-        Font companyFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.DARK_GRAY); // Smaller font size to prevent wrapping
-        Font dateFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.DARK_GRAY); // Smaller font size for date
-        // Create a single Paragraph for company name and date
-        Paragraph companyAndDate = new Paragraph();
-        companyAndDate.add(new Phrase(companyName.toUpperCase() + "\n", companyFont)); // Company name in uppercase for better visibility
-        companyAndDate.add(new Phrase(formattedDate, dateFont));
-        companyAndDate.setAlignment(Element.ALIGN_RIGHT); // Align the paragraph to the right
+        Paragraph title = new Paragraph("Order Details", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingBefore(10f);
+        document.add(title);
 
-        PdfPCell companyAndDateCell = new PdfPCell(companyAndDate);
-        companyAndDateCell.setBorder(Rectangle.NO_BORDER);
-        companyAndDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        companyAndDateCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        companyAndDateCell.setPaddingRight(10);
-        headerTable.addCell(companyAndDateCell);
+        PdfPTable table = new PdfPTable(new float[]{4f, 1.8f, 2f, 2f, 3.4f});
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10f);
+        addTableHeader(table, new String[]{"Item", "Quantity", "Price", "Subtotal", "Suggested Price per Item"});
 
-        // Ensure the logo and text are aligned on the same baseline
-        headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
-        headerTable.getDefaultCell().setVerticalAlignment(Element.ALIGN_BOTTOM);
+        boolean alternateColor = false;
+        BaseColor lightGray = new BaseColor(240, 240, 240); // Light gray color for alternate rows
 
-        // Add the header table to the document
-        document.add(headerTable);
-        document.add(Chunk.NEWLINE);
+        for (OrderItemDto item : orderDto.getOrderItems()) {
+            String productName = productService.getProductNameById(item.getProductId());
+            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), item.getPrice());
+            BigDecimal subtotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
 
-        // Clean up the temporary file
-        Files.deleteIfExists(logoPath);
+            table.addCell(createCell(productName, Font.FontFamily.HELVETICA, 12, Element.ALIGN_LEFT, alternateColor ? lightGray : BaseColor.WHITE));
+            table.addCell(createCell(String.valueOf(item.getQuantity()), Font.FontFamily.HELVETICA, 12, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
+            table.addCell(createPriceCell(item.getPrice(), Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
+            table.addCell(createPriceCell(subtotal, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
+            table.addCell(createPriceCell(suggestedPrice, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
+
+            alternateColor = !alternateColor; // Toggle the color for the next row
+        }
+        document.add(table);
+
+        Paragraph total = new Paragraph("Total Price: " + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        total.setAlignment(Element.ALIGN_RIGHT);
+        total.setSpacingBefore(5f);
+        document.add(total);
+
+        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
     }
-*/
 
-    private void addCompanyHeader(Document document, String companyName) throws DocumentException, IOException {
-        // Format the current date and time
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(new Date());
+    private void addTableHeader(PdfPTable table, String[] headerTitles) {
+        Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+        PdfPCell headerCell;
 
-        // Create a table for the header with two columns
-        PdfPTable headerTable = new PdfPTable(2); // Two columns for logo and company name with date
-        headerTable.setWidthPercentage(100);
+        // Light gray color for a lighter and simpler header
+        BaseColor headerBackgroundColor = new BaseColor(230, 230, 230);
 
+        for (String title : headerTitles) {
+            headerCell = new PdfPCell(new Phrase(title, headerFont));
+            headerCell.setBackgroundColor(headerBackgroundColor); // Set a light gray background
+            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            headerCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            headerCell.setPadding(5);
+            table.addCell(headerCell);
+        }
+    }
+
+    private PdfPCell createCell(String content, Font.FontFamily fontFamily, int size, int alignment, BaseColor backgroundColor) {
+        PdfPCell cell = new PdfPCell(new Phrase(content, new Font(fontFamily, size)));
+        cell.setHorizontalAlignment(alignment);
+        cell.setBackgroundColor(backgroundColor);
+        return cell;
+    }
+
+    private PdfPCell createPriceCell(BigDecimal price, int alignment, BaseColor backgroundColor) {
+        PdfPCell cell = new PdfPCell(new Phrase(price.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
+        cell.setHorizontalAlignment(alignment);
+        cell.setBackgroundColor(backgroundColor);
+        return cell;
+    }
+
+
+
+
+    private void addCompanyHeader(Document document) throws DocumentException, IOException {
         // Load the company logo image using ClassPathResource
         ClassPathResource logoResource = new ClassPathResource("/images/macolam.logo.png");
-        Path logoPath = Files.createTempFile("logo", ".png");
-        Files.copy(logoResource.getInputStream(), logoPath, StandardCopyOption.REPLACE_EXISTING);
-        Image logoImage = Image.getInstance(logoPath.toAbsolutePath().toString());
-        logoImage.scaleToFit(50, 50); // Adjust the size of the logo as needed
+        Image logoImage = Image.getInstance(logoResource.getURL());
+        logoImage.scaleAbsoluteHeight(80); // Adjusted logo height
+        logoImage.scaleAbsoluteWidth(80 * logoImage.getWidth() / logoImage.getHeight()); // Maintain aspect ratio
         PdfPCell logoCell = new PdfPCell(logoImage, false);
         logoCell.setBorder(Rectangle.NO_BORDER);
         logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         logoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         logoCell.setPaddingLeft(10);
         logoCell.setPaddingTop(10);
+
+        // Create a table for the header with a single column for the logo
+        PdfPTable headerTable = new PdfPTable(1); // Only one column for the logo
+        headerTable.setWidthPercentage(100);
         headerTable.addCell(logoCell);
 
-        // Enhance the company name and date format
-        Font companyFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, new BaseColor(0, 102, 204)); // Larger font size, bold and colored
-        Font dateFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL, BaseColor.GRAY); // Slightly larger font for date, gray color
-
-        // Create a single Paragraph for company name and date
-        Paragraph companyAndDate = new Paragraph();
-        companyAndDate.add(new Phrase(companyName.toUpperCase() + "\n", companyFont)); // Company name in uppercase for better visibility
-        companyAndDate.add(new Phrase(formattedDate, dateFont));
-        companyAndDate.setAlignment(Element.ALIGN_RIGHT); // Align the paragraph to the right
-
-        PdfPCell companyAndDateCell = new PdfPCell(companyAndDate);
-        companyAndDateCell.setBorder(Rectangle.NO_BORDER);
-        companyAndDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        companyAndDateCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        companyAndDateCell.setPaddingRight(10);
-        headerTable.addCell(companyAndDateCell);
-
-        // Ensure the logo and text are aligned on the same baseline
+        // Ensure the logo is aligned on the same baseline
         headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
         headerTable.getDefaultCell().setVerticalAlignment(Element.ALIGN_BOTTOM);
 
         // Add the header table to the document
         document.add(headerTable);
         document.add(Chunk.NEWLINE);
-
-        // Clean up the temporary file
-        Files.deleteIfExists(logoPath);
     }
 
 
 
     private void addOrderHeader(Document document, OrderDto orderDto) throws DocumentException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
         String formattedDate = orderDto.getCreatedAt().format(formatter);
 
-        Paragraph orderHeader = new Paragraph("Order Summary - #" + orderDto.getId(), new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
+        // Elegant and concise order summary text
+        Paragraph orderHeader = new Paragraph("Order Summary",
+                new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
         orderHeader.setAlignment(Element.ALIGN_CENTER);
         document.add(orderHeader);
 
-        Paragraph date = new Paragraph("Date: " + formattedDate, new Font(Font.FontFamily.HELVETICA, 12));
-        date.setAlignment(Element.ALIGN_CENTER);
-        document.add(date);
+        // Order details with Order Number first, then Order Placed date
+        Paragraph orderDetails = new Paragraph("Order Number: #" + orderDto.getId() +
+                "\nOrder Placed: " + formattedDate,
+                new Font(Font.FontFamily.HELVETICA, 12));
+        orderDetails.setAlignment(Element.ALIGN_CENTER);
+        document.add(orderDetails);
 
         document.add(Chunk.NEWLINE);
     }
+
+
 
     private void addOrderCustomerDetails(Document document, CustomerDto customerDto, OrderDto orderDto) throws DocumentException {
         Paragraph title = new Paragraph("Customer Details", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK));
@@ -455,125 +511,6 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
         document.add(new LineSeparator(0.5f, 100, null, 0, -5));
         document.add(Chunk.NEWLINE);
-    }
-
-
-
-/*
-    private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
-        // Adding a bit more space before the title
-        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
-
-        Paragraph title = new Paragraph("Order Details", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
-        title.setAlignment(Element.ALIGN_LEFT);
-        title.setSpacingBefore(10f); // Adding space before the title
-        document.add(title);
-
-        // Creating the table for order details with adjusted column widths
-        PdfPTable table = new PdfPTable(new float[]{4f, 1.3f, 2f, 2f, 3.4f});
-        table.setWidthPercentage(100);
-        table.setSpacingBefore(10f); // Adding space before the table
-        addTableHeader(table, new String[]{"Item", "Quantity", "Price", "Subtotal", "Suggested Price per Item"}); // Corrected header titles
-
-        // Populating the table with order item details
-        for (OrderItemDto item : orderDto.getOrderItems()) {
-            String productName = productService.getProductNameById(item.getProductId());
-            // Assuming the method exists to fetch the suggested price
-            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), item.getPrice());
-            BigDecimal subtotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
-
-            // Add table cells for each order item
-            table.addCell(new PdfPCell(new Phrase(productName, new Font(Font.FontFamily.HELVETICA, 12))));
-            table.addCell(new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), new Font(Font.FontFamily.HELVETICA, 12))));
-            table.addCell(new PdfPCell(new Phrase("$" + item.getPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
-            table.addCell(new PdfPCell(new Phrase("$" + subtotal.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
-            table.addCell(new PdfPCell(new Phrase("$" + suggestedPrice.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
-        }
-        document.add(table);
-
-        // Total Price
-        Paragraph total = new Paragraph("Total Price: $" + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD));
-        total.setAlignment(Element.ALIGN_RIGHT);
-        total.setSpacingBefore(5f); // Adding space before the total price
-        document.add(total);
-
-        // Adding a bit more space after the section
-        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
-    }
-
-*/
-
-    private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
-        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
-
-        Paragraph title = new Paragraph("Order Details", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
-        title.setAlignment(Element.ALIGN_LEFT);
-        title.setSpacingBefore(10f);
-        document.add(title);
-
-        PdfPTable table = new PdfPTable(new float[]{4f, 1.8f, 2f, 2f, 3.4f});
-        table.setWidthPercentage(100);
-        table.setSpacingBefore(10f);
-        addTableHeader(table, new String[]{"Item", "Quantity", "Price", "Subtotal", "Suggested Price per Item"});
-
-        // Alternate row color for better readability
-        boolean alternateColor = false;
-        BaseColor lightGray = new BaseColor(240, 240, 240); // Light gray color
-
-        for (OrderItemDto item : orderDto.getOrderItems()) {
-            String productName = productService.getProductNameById(item.getProductId());
-            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), item.getPrice());
-            BigDecimal subtotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
-
-            PdfPCell cell;
-
-            cell = new PdfPCell(new Phrase(productName, new Font(Font.FontFamily.HELVETICA, 12)));
-            cell.setBackgroundColor(alternateColor ? lightGray : BaseColor.WHITE);
-            table.addCell(cell);
-
-            cell = new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), new Font(Font.FontFamily.HELVETICA, 12)));
-            cell.setBackgroundColor(alternateColor ? lightGray : BaseColor.WHITE);
-            table.addCell(cell);
-
-            cell = createPriceCell(item.getPrice());
-            cell.setBackgroundColor(alternateColor ? lightGray : BaseColor.WHITE);
-            table.addCell(cell);
-
-            cell = createPriceCell(subtotal);
-            cell.setBackgroundColor(alternateColor ? lightGray : BaseColor.WHITE);
-            table.addCell(cell);
-
-            cell = createPriceCell(suggestedPrice);
-            cell.setBackgroundColor(alternateColor ? lightGray : BaseColor.WHITE);
-            table.addCell(cell);
-
-            alternateColor = !alternateColor; // Toggle the color for the next row
-        }
-        document.add(table);
-
-        Paragraph total = new Paragraph("Total Price: " + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD));
-        total.setAlignment(Element.ALIGN_RIGHT);
-        total.setSpacingBefore(5f);
-        document.add(total);
-
-        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
-    }
-
-    private PdfPCell createPriceCell(BigDecimal amount) {
-        PdfPCell cell = new PdfPCell(new Phrase("$" + amount.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12)));
-        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        cell.setPaddingRight(10); // Add padding for better alignment
-        return cell;
-    }
-    private void addTableHeader(PdfPTable table, String[] headerTitles) {
-        for (String headerTitle : headerTitles) {
-            PdfPCell header = new PdfPCell(new Phrase(headerTitle, new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)));
-            header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-            header.setHorizontalAlignment(Element.ALIGN_CENTER);
-            header.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            header.setPadding(5);
-            table.addCell(header);
-        }
     }
 
 

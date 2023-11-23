@@ -200,12 +200,12 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         // Check if the order is already cancelled
-        if (order.getOrderStatus().equals("Cancelled")) {
+        if (order.getOrderStatus().equalsIgnoreCase("Cancelled")) {
             throw new IllegalStateException("Order is already cancelled.");
         }
 
         // Update the order status to "Cancelled"
-        order.setOrderStatus("Cancelled");
+        order.setOrderStatus("CANCELLED");
 
         // Save the updated order
         orderRepository.save(order);
@@ -214,7 +214,7 @@ public class OrderServiceImpl implements OrderService {
         Payment payment = paymentRepository.findByOrderId(order.getId()).orElse(null);
 
         if (payment != null) {
-            payment.setStatus("Cancelled");
+            payment.setStatus("CANCELLED");
             paymentRepository.save(payment);
         }
     }
