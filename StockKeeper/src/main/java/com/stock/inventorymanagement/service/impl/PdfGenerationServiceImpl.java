@@ -168,69 +168,18 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     }
 
 
-    /*
     private void addCartItems(Document document, Long cartId) throws DocumentException {
         List<CartItemDto> cartItems = cartItemService.getCartItemsByCartId(cartId);
-        PdfPTable table = new PdfPTable(new float[]{3f, 1.2f, 2f, 2f, 3f}); // Append 'f' to make the numbers float literals // Adjust column widths for the new header
-        table.setWidthPercentage(100);
-
-        // Define table headers with improved styling
-        Stream.of("Product Name", "Quantity", "Price per Item", "Subtotal", "Suggested Price per Item") // Updated header title
-                .forEach(columnTitle -> {
-                    PdfPCell header = new PdfPCell(new Phrase(columnTitle, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10)));
-                    header.setBackgroundColor(BaseColor.LIGHT_GRAY); // Light gray background for header
-                    header.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    header.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    header.setPadding(5); // Add padding for better aesthetics
-                    table.addCell(header);
-                });
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        // Adding cart items with enhanced styling
-        for (CartItemDto item : cartItems) {
-            String productName = productService.getProductNameById(item.getProductId());
-            BigDecimal price = safelyFetchSalesPrice(item.getProductId(), item.getPrice());
-            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), price);
-            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
-
-            // Add product details to the table with improved styling
-            addTableCell(table, productName, Element.ALIGN_LEFT);
-            addTableCell(table, String.valueOf(item.getQuantity()), Element.ALIGN_CENTER);
-            addTableCell(table, "$" + price.toPlainString(), Element.ALIGN_RIGHT);
-            addTableCell(table, "$" + lineTotal.toPlainString(), Element.ALIGN_RIGHT);
-            addTableCell(table, "$" + suggestedPrice.toPlainString(), Element.ALIGN_RIGHT);
-
-            total = total.add(lineTotal);
-        }
-
-        document.add(table);
-        document.add(Chunk.NEWLINE);
-        document.add(new Paragraph("Total Cost: $" + total.toPlainString(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-        document.add(Chunk.NEWLINE);
-    }
-
-    private void addTableCell(PdfPTable table, String text, int alignment) {
-        PdfPCell cell = new PdfPCell(new Phrase(text, FontFactory.getFont(FontFactory.HELVETICA, 12)));
-        cell.setHorizontalAlignment(alignment);
-        cell.setPadding(3); // Add padding for a neat layout
-        cell.setBorderWidth(0.5f); // Set a subtle border width
-        table.addCell(cell);
-    }
-
-    */
-
-
-    private void addCartItems(Document document, Long cartId) throws DocumentException {
-        List<CartItemDto> cartItems = cartItemService.getCartItemsByCartId(cartId);
-        PdfPTable table = new PdfPTable(new float[]{3f, 1.8f, 3f, 3f, 3f});
+        // Adjusted column widths for uniformity
+        PdfPTable table = new PdfPTable(new float[]{4f, 2f, 2f, 2f, 2f});
         table.setWidthPercentage(100);
 
         // Define table headers with improved and lighter styling
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
         BaseColor headerBackgroundColor = new BaseColor(245, 245, 245); // Very light gray for a softer appearance
 
-        Stream.of("Product Name", "Quantity", "Price per Item", "Subtotal", "Suggested Price per Item")
+        // Changed header title and order
+        Stream.of("Product Name", "Retail Price", "Quantity", "Price per Item", "Subtotal")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell(new Phrase(columnTitle, headerFont));
                     header.setBackgroundColor(headerBackgroundColor);
@@ -246,15 +195,15 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         for (CartItemDto item : cartItems) {
             String productName = productService.getProductNameById(item.getProductId());
             BigDecimal price = safelyFetchSalesPrice(item.getProductId(), item.getPrice());
-            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), price);
+            BigDecimal retailPrice = fetchSuggestedPrice(item.getProductId(), price); // Renamed variable for clarity
             BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
 
-            // Add product details to the table with improved styling
+            // Adjusted cell addition order and alignment
             addTableCell(table, productName, Element.ALIGN_LEFT);
+            addTableCell(table, "$" + retailPrice.toPlainString(), Element.ALIGN_RIGHT); // Retail Price
             addTableCell(table, String.valueOf(item.getQuantity()), Element.ALIGN_CENTER);
             addTableCell(table, "$" + price.toPlainString(), Element.ALIGN_RIGHT);
             addTableCell(table, "$" + lineTotal.toPlainString(), Element.ALIGN_RIGHT);
-            addTableCell(table, "$" + suggestedPrice.toPlainString(), Element.ALIGN_RIGHT);
 
             total = total.add(lineTotal);
         }
@@ -264,6 +213,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         document.add(new Paragraph("Total Cost: $" + total.toPlainString(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
         document.add(Chunk.NEWLINE);
     }
+
 
     private void addTableCell(PdfPTable table, String text, int alignment) {
         PdfPCell cell = new PdfPCell(new Phrase(text, FontFactory.getFont(FontFactory.HELVETICA, 10)));
@@ -366,7 +316,6 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     }
 
 
-
     private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
@@ -375,10 +324,12 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         title.setSpacingBefore(10f);
         document.add(title);
 
-        PdfPTable table = new PdfPTable(new float[]{4f, 1.8f, 2f, 2f, 3.4f});
+        // Adjusted column widths
+        PdfPTable table = new PdfPTable(new float[]{5f, 2f, 2f, 2f, 2f});
         table.setWidthPercentage(100);
         table.setSpacingBefore(10f);
-        addTableHeader(table, new String[]{"Item", "Quantity", "Price", "Subtotal", "Suggested Price per Item"});
+        // Updated header with "Retail Price" next to "Product"
+        addTableHeader(table, new String[]{"Item", "Retail Price", "Quantity", "Price", "Subtotal"});
 
         boolean alternateColor = false;
         BaseColor lightGray = new BaseColor(240, 240, 240); // Light gray color for alternate rows
@@ -389,10 +340,11 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             BigDecimal subtotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
 
             table.addCell(createCell(productName, Font.FontFamily.HELVETICA, 12, Element.ALIGN_LEFT, alternateColor ? lightGray : BaseColor.WHITE));
+            // Moved retail price cell next to product name
+            table.addCell(createPriceCell(suggestedPrice, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
             table.addCell(createCell(String.valueOf(item.getQuantity()), Font.FontFamily.HELVETICA, 12, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
             table.addCell(createPriceCell(item.getPrice(), Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
             table.addCell(createPriceCell(subtotal, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
-            table.addCell(createPriceCell(suggestedPrice, Element.ALIGN_RIGHT, alternateColor ? lightGray : BaseColor.WHITE));
 
             alternateColor = !alternateColor; // Toggle the color for the next row
         }
@@ -405,6 +357,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
     }
+
 
     private void addTableHeader(PdfPTable table, String[] headerTitles) {
         Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
