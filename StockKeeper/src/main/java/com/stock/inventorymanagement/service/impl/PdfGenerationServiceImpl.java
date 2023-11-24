@@ -315,7 +315,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         }
     }
 
-
+/*
     private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
@@ -357,6 +357,43 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
     }
+*/
+
+    private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
+        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
+
+        Paragraph title = new Paragraph("Order Details", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingBefore(10f);
+        document.add(title);
+
+        PdfPTable table = new PdfPTable(new float[]{5f, 2f, 2f, 2f, 2f});
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10f);
+        addTableHeader(table, new String[]{"Item", "Retail Price", "Quantity", "Price", "Subtotal"});
+
+        for (OrderItemDto item : orderDto.getOrderItems()) {
+            String productName = productService.getProductNameById(item.getProductId());
+            BigDecimal suggestedPrice = fetchSuggestedPrice(item.getProductId(), item.getPrice());
+            BigDecimal subtotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
+
+            // Cells now consistently use a white background color
+            table.addCell(createCell(productName, Font.FontFamily.HELVETICA, 12, Element.ALIGN_LEFT, BaseColor.WHITE));
+            table.addCell(createPriceCell(suggestedPrice, Element.ALIGN_RIGHT, BaseColor.WHITE));
+            table.addCell(createCell(String.valueOf(item.getQuantity()), Font.FontFamily.HELVETICA, 12, Element.ALIGN_RIGHT, BaseColor.WHITE));
+            table.addCell(createPriceCell(item.getPrice(), Element.ALIGN_RIGHT, BaseColor.WHITE));
+            table.addCell(createPriceCell(subtotal, Element.ALIGN_RIGHT, BaseColor.WHITE));
+        }
+        document.add(table);
+
+        Paragraph total = new Paragraph("Total Price: " + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        total.setAlignment(Element.ALIGN_RIGHT);
+        total.setSpacingBefore(5f);
+        document.add(total);
+
+        document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
+    }
+
 
 
     private void addTableHeader(PdfPTable table, String[] headerTitles) {

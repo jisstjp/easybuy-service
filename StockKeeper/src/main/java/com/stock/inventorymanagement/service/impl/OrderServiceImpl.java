@@ -295,8 +295,10 @@ public class OrderServiceImpl implements OrderService {
             if (orderDto.getPayment() != null && orderDto.getPayment().getStatus() != null) {
                 // Update the payment status from the DTO if provided
                 payment.setStatus(orderDto.getPayment().getStatus());
-            } else if ("Completed".equalsIgnoreCase(existingOrder.getOrderStatus()) && payment.getStatus() == null) {
-                // Set payment status to "Completed" if the order status is "Completed" and payment status is not provided
+            } else if (( "Completed".equalsIgnoreCase(existingOrder.getOrderStatus()) ||
+                    "Complete".equalsIgnoreCase(existingOrder.getOrderStatus()) ) &&
+                    payment.getStatus() == null) {
+                // Set payment status to "Completed" if the order status is "Completed" or "Complete" and payment status is not provided
                 payment.setStatus("Completed");
             }
             paymentRepository.save(payment);
