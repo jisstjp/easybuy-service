@@ -29,4 +29,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("UPDATE Cart c SET c.isDeleted = true WHERE c.id = :cartId AND c.isDeleted = false")
     void markCartAsDeleted(@Param("cartId") Long cartId);
 
+
+    boolean existsByUserId(Long userId);
+
 }
