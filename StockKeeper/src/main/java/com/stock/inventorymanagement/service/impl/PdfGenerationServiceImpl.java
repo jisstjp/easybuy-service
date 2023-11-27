@@ -359,6 +359,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     }
 */
 
+
     private void addOrderDetails(Document document, OrderDto orderDto) throws DocumentException {
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
@@ -379,20 +380,24 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
             // Cells now consistently use a white background color
             table.addCell(createCell(productName, Font.FontFamily.HELVETICA, 12, Element.ALIGN_LEFT, BaseColor.WHITE));
-            table.addCell(createPriceCell(suggestedPrice, Element.ALIGN_RIGHT, BaseColor.WHITE));
-            table.addCell(createCell(String.valueOf(item.getQuantity()), Font.FontFamily.HELVETICA, 12, Element.ALIGN_RIGHT, BaseColor.WHITE));
-            table.addCell(createPriceCell(item.getPrice(), Element.ALIGN_RIGHT, BaseColor.WHITE));
-            table.addCell(createPriceCell(subtotal, Element.ALIGN_RIGHT, BaseColor.WHITE));
+
+            // Add formatted price cells directly here
+            table.addCell(new PdfPCell(new Phrase("$" + suggestedPrice.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
+            table.addCell(new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), new Font(Font.FontFamily.HELVETICA, 12))));
+            table.addCell(new PdfPCell(new Phrase("$" + item.getPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
+            table.addCell(new PdfPCell(new Phrase("$" + subtotal.toPlainString(), new Font(Font.FontFamily.HELVETICA, 12))));
         }
         document.add(table);
 
-        Paragraph total = new Paragraph("Total Price: " + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+        Paragraph total = new Paragraph("Total Price: $" + orderDto.getTotalPrice().toPlainString(), new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
         total.setAlignment(Element.ALIGN_RIGHT);
         total.setSpacingBefore(5f);
         document.add(total);
 
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
     }
+
+
 
 
 
