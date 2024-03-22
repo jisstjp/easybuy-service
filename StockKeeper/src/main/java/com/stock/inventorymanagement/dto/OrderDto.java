@@ -14,6 +14,7 @@ public class OrderDto {
     private Long userId;
     private Long cartId;
     private BigDecimal totalPrice;
+    private BigDecimal storeCreditApplied;
     private PaymentDto payment;
     private String orderStatus;
     private String shippingAddress;
@@ -90,5 +91,13 @@ public class OrderDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public BigDecimal getStoreCreditApplied() {
+        return storeCreditApplied;
+    }
+
+    public void setStoreCreditApplied(BigDecimal storeCreditApplied) {
+        this.storeCreditApplied = storeCreditApplied;
     }
 }

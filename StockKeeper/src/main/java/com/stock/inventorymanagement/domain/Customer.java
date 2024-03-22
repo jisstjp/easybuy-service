@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.domain;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -104,244 +105,252 @@ public class Customer {
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
+
+    @OneToMany(mappedBy = "customer")
+    private List<CustomerLicense> customerLicenses;
+
+
+    @Column(name = "store_credit", nullable = true)
+    private BigDecimal storeCredit;
+
     public Long getId() {
-	return id;
+        return id;
     }
 
     public void setId(Long id) {
-	this.id = id;
+        this.id = id;
     }
 
     public String getFirstName() {
-	return firstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-	this.firstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-	return lastName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-	this.lastName = lastName;
+        this.lastName = lastName;
     }
 
     public boolean isNewsletter() {
-	return newsletter;
+        return newsletter;
     }
 
     public void setNewsletter(boolean newsletter) {
-	this.newsletter = newsletter;
+        this.newsletter = newsletter;
     }
 
     public String getTaxFile() {
-	return taxFile;
+        return taxFile;
     }
 
     public void setTaxFile(String taxFile) {
-	this.taxFile = taxFile;
+        this.taxFile = taxFile;
     }
 
     public String getWebsite() {
-	return website;
+        return website;
     }
 
     public void setWebsite(String website) {
-	this.website = website;
+        this.website = website;
     }
 
     public String getPhone() {
-	return phone;
+        return phone;
     }
 
     public void setPhone(String phone) {
-	this.phone = phone;
+        this.phone = phone;
     }
 
     public String getTaxIdNumber() {
-	return taxIdNumber;
+        return taxIdNumber;
     }
 
     public void setTaxIdNumber(String taxIdNumber) {
-	this.taxIdNumber = taxIdNumber;
+        this.taxIdNumber = taxIdNumber;
     }
 
     public String getCompany() {
-	return company;
+        return company;
     }
 
     public void setCompany(String company) {
-	this.company = company;
+        this.company = company;
     }
 
     public String getAddressLine1() {
-	return addressLine1;
+        return addressLine1;
     }
 
     public void setAddressLine1(String addressLine1) {
-	this.addressLine1 = addressLine1;
+        this.addressLine1 = addressLine1;
     }
 
     public String getAddressLine2() {
-	return addressLine2;
+        return addressLine2;
     }
 
     public void setAddressLine2(String addressLine2) {
-	this.addressLine2 = addressLine2;
+        this.addressLine2 = addressLine2;
     }
 
     public String getCity() {
-	return city;
+        return city;
     }
 
     public void setCity(String city) {
-	this.city = city;
+        this.city = city;
     }
 
     public String getStateProvince() {
-	return stateProvince;
+        return stateProvince;
     }
 
     public void setStateProvince(String stateProvince) {
-	this.stateProvince = stateProvince;
+        this.stateProvince = stateProvince;
     }
 
     public String getZipPostalCode() {
-	return zipPostalCode;
+        return zipPostalCode;
     }
 
     public void setZipPostalCode(String zipPostalCode) {
-	this.zipPostalCode = zipPostalCode;
+        this.zipPostalCode = zipPostalCode;
     }
 
     public String getCountry() {
-	return country;
+        return country;
     }
 
     public void setCountry(String country) {
-	this.country = country;
+        this.country = country;
     }
 
     public String getEmail() {
-	return email;
+        return email;
     }
 
     public void setEmail(String email) {
-	this.email = email;
+        this.email = email;
     }
 
     public String getPassword() {
-	return password;
+        return password;
     }
 
     public void setPassword(String password) {
-	this.password = password;
+        this.password = password;
     }
 
     public String getBusinessName() {
-	return businessName;
+        return businessName;
     }
 
     public void setBusinessName(String businessName) {
-	this.businessName = businessName;
+        this.businessName = businessName;
     }
 
     public String getBusinessSetup() {
-	return businessSetup;
+        return businessSetup;
     }
 
     public void setBusinessSetup(String businessSetup) {
-	this.businessSetup = businessSetup;
+        this.businessSetup = businessSetup;
     }
 
     public String getBusinessOrganization() {
-	return businessOrganization;
+        return businessOrganization;
     }
 
     public void setBusinessOrganization(String businessOrganization) {
-	this.businessOrganization = businessOrganization;
+        this.businessOrganization = businessOrganization;
     }
 
     public Integer getYearsInBusiness() {
-	return yearsInBusiness;
+        return yearsInBusiness;
     }
 
     public void setYearsInBusiness(Integer yearsInBusiness) {
-	this.yearsInBusiness = yearsInBusiness;
+        this.yearsInBusiness = yearsInBusiness;
     }
 
     public Integer getLocations() {
-	return locations;
+        return locations;
     }
 
     public void setLocations(Integer locations) {
-	this.locations = locations;
+        this.locations = locations;
     }
 
     public String getBusinessType() {
-	return businessType;
+        return businessType;
     }
 
     public void setBusinessType(String businessType) {
-	this.businessType = businessType;
+        this.businessType = businessType;
     }
 
     public String getSalesChannel() {
-	return salesChannel;
+        return salesChannel;
     }
 
     public void setSalesChannel(String salesChannel) {
-	this.salesChannel = salesChannel;
+        this.salesChannel = salesChannel;
     }
 
     public String getHowDidYouHear() {
-	return howDidYouHear;
+        return howDidYouHear;
     }
 
     public void setHowDidYouHear(String howDidYouHear) {
-	this.howDidYouHear = howDidYouHear;
+        this.howDidYouHear = howDidYouHear;
     }
 
     public BigDecimal getMonthlyInventoryBudget() {
-	return monthlyInventoryBudget;
+        return monthlyInventoryBudget;
     }
 
     public void setMonthlyInventoryBudget(BigDecimal monthlyInventoryBudget) {
-	this.monthlyInventoryBudget = monthlyInventoryBudget;
+        this.monthlyInventoryBudget = monthlyInventoryBudget;
     }
 
     public Long getCreatedBy() {
-	return createdBy;
+        return createdBy;
     }
 
     public void setCreatedBy(Long createdBy) {
-	this.createdBy = createdBy;
+        this.createdBy = createdBy;
     }
 
     public Long getUpdatedBy() {
-	return updatedBy;
+        return updatedBy;
     }
 
     public void setUpdatedBy(Long updatedBy) {
-	this.updatedBy = updatedBy;
+        this.updatedBy = updatedBy;
     }
 
     public Boolean getIsDeleted() {
-	return isDeleted;
+        return isDeleted;
     }
 
     public void setIsDeleted(Boolean isDeleted) {
-	this.isDeleted = isDeleted;
+        this.isDeleted = isDeleted;
     }
 
     public String getApprovalStatus() {
-	return approvalStatus;
+        return approvalStatus;
     }
 
     public void setApprovalStatus(String approvalStatus) {
-	this.approvalStatus = approvalStatus;
+        this.approvalStatus = approvalStatus;
     }
 
     public User getUser() {
@@ -351,4 +360,50 @@ public class Customer {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public List<CustomerLicense> getCustomerLicenses() {
+        return customerLicenses;
+    }
+
+    public void setCustomerLicenses(List<CustomerLicense> customerLicenses) {
+        this.customerLicenses = customerLicenses;
+    }
+
+
+    private void initializeStoreCreditIfNull() {
+        if (this.storeCredit == null) {
+            this.storeCredit = BigDecimal.ZERO;
+        }
+    }
+
+    public void addToStoreCredit(BigDecimal amount) {
+        initializeStoreCreditIfNull();
+        if (amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
+            this.storeCredit = this.storeCredit.add(amount);
+        }
+    }
+
+    public void subtractFromStoreCredit(BigDecimal amount) {
+        initializeStoreCreditIfNull();
+        if (amount != null && amount.compareTo(BigDecimal.ZERO) > 0 && this.storeCredit.compareTo(amount) >= 0) {
+            this.storeCredit = this.storeCredit.subtract(amount);
+        }
+    }
+
+    public BigDecimal getStoreCredit() {
+        return storeCredit == null ? BigDecimal.ZERO : storeCredit;
+    }
+
+    public void setStoreCredit(BigDecimal storeCredit) {
+        this.storeCredit = storeCredit;
+    }
+
 }

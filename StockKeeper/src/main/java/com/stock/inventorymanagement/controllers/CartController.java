@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.stock.inventorymanagement.dto.CartEmailRequestDto;
-import com.stock.inventorymanagement.service.IEmailService;
 import com.stock.inventorymanagement.service.impl.PdfGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

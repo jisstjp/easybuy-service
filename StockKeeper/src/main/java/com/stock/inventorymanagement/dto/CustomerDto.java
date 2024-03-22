@@ -1,8 +1,12 @@
 package com.stock.inventorymanagement.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
+
 public class CustomerDto {
     private Long id;
     private String firstName;
@@ -11,6 +15,7 @@ public class CustomerDto {
     private String taxFile;
     private String website;
     private String phone;
+    @JsonIgnore
     private String taxIdNumber;
     private String company;
     private String addressLine1;
@@ -31,6 +36,10 @@ public class CustomerDto {
     private String howDidYouHear;
     private BigDecimal monthlyInventoryBudget;
     private String approvalStatus;
+
+    private List<CustomerLicenseDto> customerLicenseDto;
+
+    private BigDecimal storeCredit;
 
     public Long getId() {
 	return id;
@@ -248,4 +257,19 @@ public class CustomerDto {
 	this.approvalStatus = approvalStatus;
     }
 
+    public List<CustomerLicenseDto> getCustomerLicenseDto() {
+        return customerLicenseDto;
+    }
+
+    public void setCustomerLicenseDto(List<CustomerLicenseDto> customerLicenseDto) {
+        this.customerLicenseDto = customerLicenseDto;
+    }
+
+    public BigDecimal getStoreCredit() {
+        return storeCredit;
+    }
+
+    public void setStoreCredit(BigDecimal storeCredit) {
+        this.storeCredit = storeCredit;
+    }
 }

@@ -12,7 +12,10 @@ import com.stock.inventorymanagement.dto.UserDto;
 import com.stock.inventorymanagement.service.UserService;
 import com.stock.inventorymanagement.util.JwtTokenUtil;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -46,5 +49,25 @@ public class BaseController {
         }
         return false; // If authentication is not available or user has no matching authority
     }
+
+    protected boolean hasAnyRole(HttpServletRequest request, Authentication authentication, String... roles) {
+        String authToken = request.getHeader("Authorization");
+        if (authToken != null && authToken.startsWith("Bearer ")) {
+            String token = authToken.substring(7);
+
+            if (authentication != null) {
+                Set<String> requiredRoles = Arrays.stream(roles)
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toSet());
+
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                return authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .anyMatch(authority -> requiredRoles.contains(authority.toUpperCase()));
+            }
+        }
+        return false; // If authentication is not available or user has no matching authority
+    }
+
 
 }

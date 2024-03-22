@@ -3,6 +3,7 @@ package com.stock.inventorymanagement.controllers;
 import com.stock.inventorymanagement.dto.CustomerDto;
 import com.stock.inventorymanagement.dto.CustomerInfoDto;
 import com.stock.inventorymanagement.dto.CustomerSearchCriteria;
+import com.stock.inventorymanagement.dto.StoreCreditUpdateRequest;
 import com.stock.inventorymanagement.exception.ErrorResponse;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.service.CustomerService;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +56,10 @@ public class CustomerController extends BaseController {
     public ResponseEntity<?> updateCustomer(HttpServletRequest request, @PathVariable("id") Long id,
                                             @RequestBody CustomerDto customerDto) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!hasAnyRole(request, authentication,"ROLE_ADMIN")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
             Long userId = getUserIdFromToken(request);
             CustomerDto updatedCustomer = customerService.updateCustomer(id, customerDto, userId);
             return ResponseEntity.ok(updatedCustomer);
@@ -65,15 +72,20 @@ public class CustomerController extends BaseController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Page<CustomerDto>> searchCustomers(@RequestBody CustomerSearchCriteria searchCriteria,
+    public ResponseEntity<Page<CustomerDto>> searchCustomers(HttpServletRequest request,@RequestBody CustomerSearchCriteria searchCriteria,
                                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!hasAnyRole(request, authentication,"ROLE_ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         Page<CustomerDto> customerPage = customerService.searchCustomers(searchCriteria, page, size);
         return ResponseEntity.ok(customerPage);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getCustomerByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<?> getCustomerByUserId(HttpServletRequest request,@PathVariable("userId") Long userId) {
         try {
             CustomerDto customerDto = customerService.getCustomerByUserId(userId);
             return ResponseEntity.ok(mapCustomerToCustomerInfoDto(customerDto));
@@ -81,6 +93,20 @@ public class CustomerController extends BaseController {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @PutMapping("/{customerId}/store-credit")
+    public ResponseEntity<?> updateStoreCredit(HttpServletRequest request,@PathVariable Long customerId,@RequestBody StoreCreditUpdateRequest storeCreditUpdateRequest) {
+        try {
+            Long userId = getUserIdFromToken(request);
+            CustomerDto updatedCustomer = customerService.updateStoreCredit(customerId, storeCreditUpdateRequest, userId);
+            return ResponseEntity.ok(mapCustomerToCustomerInfoDto(updatedCustomer));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -97,6 +123,7 @@ public class CustomerController extends BaseController {
         customerInfoDto.setCountry(customer.getCountry());
         customerInfoDto.setEmail(customer.getEmail());
         customerInfoDto.setCompany(customer.getCompany());
+        customerInfoDto.setStoreCredit(customer.getStoreCredit());
         // Handle nullable fields
         if (customer.getPhone() != null) {
             customerInfoDto.setPhone(customer.getPhone());

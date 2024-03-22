@@ -9,6 +9,7 @@ import com.stock.inventorymanagement.dto.OrderSearchCriteria;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public interface OrderService {
 

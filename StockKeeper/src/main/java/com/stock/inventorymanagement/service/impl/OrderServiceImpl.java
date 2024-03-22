@@ -12,10 +12,7 @@ import com.stock.inventorymanagement.mapper.OrderItemMapper;
 import com.stock.inventorymanagement.mapper.OrderMapper;
 import com.stock.inventorymanagement.mapper.PaymentMapper;
 import com.stock.inventorymanagement.repository.*;
-import com.stock.inventorymanagement.service.IEmailService;
-import com.stock.inventorymanagement.service.IPdfGenerationService;
-import com.stock.inventorymanagement.service.OrderService;
-import com.stock.inventorymanagement.service.PaymentService;
+import com.stock.inventorymanagement.service.*;
 import com.stock.inventorymanagement.specification.OrderSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -83,6 +80,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     ProductServiceImpl productService;
 
+    @Autowired
+    CustomerService customerService;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public OrderDto createOrder(Long userId, OrderDto orderDto) {
@@ -93,6 +93,13 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", orderDto.getCartId()));
 
         BigDecimal totalPrice = calculateTotalSalesPriceForCart(cart);
+
+        BigDecimal availableStoreCredit = customerService.getAvailableStoreCredit(userId);
+        BigDecimal desiredCreditToApply = Optional.ofNullable(orderDto.getStoreCreditApplied()).orElse(BigDecimal.ZERO);
+        desiredCreditToApply = desiredCreditToApply.min(availableStoreCredit).min(totalPrice); // Do not exceed available credit or total price
+        totalPrice = totalPrice.subtract(desiredCreditToApply);
+
+        //customerService.updateStoreCredit(userId, availableStoreCredit.subtract(desiredCreditToApply));
 
         Order order = new Order();
         order.setUser(user);

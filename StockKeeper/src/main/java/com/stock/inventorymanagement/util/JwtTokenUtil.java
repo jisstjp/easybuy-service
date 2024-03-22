@@ -41,7 +41,7 @@ public class JwtTokenUtil {
 	                .collect(Collectors.joining(","));
 	claims.put("authorities", authorities);
 	claims.put("userId", userDetails.getUserId());
-	  return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).setIssuedAt(new Date())
+	return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).setIssuedAt(new Date())
 		.setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
 		.signWith(SignatureAlgorithm.HS512, secret).compact();
     }
@@ -72,9 +72,6 @@ public class JwtTokenUtil {
 	Date expirationDate = getExpirationDateFromToken(token);
 	return expirationDate.before(new Date());
     }
-    
-    
-   
 
     public boolean validateJwtToken(String authToken) {
 	try {

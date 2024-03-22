@@ -1,10 +1,12 @@
 package com.stock.inventorymanagement.dto;
 
+import com.stock.inventorymanagement.enums.Operator;
+
 public class CustomerSearchCriteria {
 
     private String field;
     private String value;
-    private String matchType;
+    private Operator operator;
 
     public String getField() {
 	return field;
@@ -22,12 +24,11 @@ public class CustomerSearchCriteria {
 	this.value = value;
     }
 
-    public String getMatchType() {
-	return matchType;
+    public Operator getOperator() {
+        return operator;
     }
 
-    public void setMatchType(String matchType) {
-	this.matchType = matchType;
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
-
 }

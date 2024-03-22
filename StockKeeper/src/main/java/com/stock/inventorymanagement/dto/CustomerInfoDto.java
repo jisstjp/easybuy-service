@@ -1,5 +1,7 @@
 package com.stock.inventorymanagement.dto;
 
+import java.math.BigDecimal;
+
 public class CustomerInfoDto {
     private String firstName;
     private String lastName;
@@ -12,6 +14,8 @@ public class CustomerInfoDto {
     private String email;
     private String phone;
     private String company;
+
+    private BigDecimal storeCredit;
 
     public String getFirstName() {
         return firstName;
@@ -99,5 +103,13 @@ public class CustomerInfoDto {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public BigDecimal getStoreCredit() {
+        return storeCredit;
+    }
+
+    public void setStoreCredit(BigDecimal storeCredit) {
+        this.storeCredit = storeCredit;
     }
 }
