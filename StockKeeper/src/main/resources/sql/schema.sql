@@ -379,3 +379,17 @@ ALTER TABLE products ADD COLUMN flavor VARCHAR(255);
 
 
 
+CREATE TABLE returns (
+    return_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    return_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20),
+    reason VARCHAR(255),
+    comments VARCHAR(255),
+    credit_amount DECIMAL(10, 2),
+    credit_date TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

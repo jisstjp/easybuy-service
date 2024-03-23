@@ -384,7 +384,7 @@ public class Customer {
         }
     }
 
-    public void addToStoreCredit(BigDecimal amount) {
+    public void  addToStoreCredit(BigDecimal amount) {
         initializeStoreCreditIfNull();
         if (amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
             this.storeCredit = this.storeCredit.add(amount);
