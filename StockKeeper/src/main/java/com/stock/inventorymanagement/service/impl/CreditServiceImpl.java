@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,5 +77,19 @@ public class CreditServiceImpl implements CreditService {
             customer.addToStoreCredit(amountDifference);
         }
         customerRepository.save(customer);
+    }
+
+
+    public BigDecimal getTotalCredits(Long customerId) {
+        List<Credit> activeCredits = creditRepository.findByCustomerIdAndStatusAndExpiryDateAfter(customerId, "ACTIVE", new Date());
+        BigDecimal totalCredits = BigDecimal.ZERO;
+        for (Credit credit : activeCredits) {
+            BigDecimal amount = credit.getAmount();
+            if (amount != null) {
+                totalCredits = totalCredits.add(amount);
+            }
+            // If amount is null, it will be skipped and not added to totalCredits
+        }
+        return totalCredits;
     }
 }
