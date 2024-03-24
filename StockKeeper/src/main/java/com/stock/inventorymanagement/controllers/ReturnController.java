@@ -74,4 +74,16 @@ public class ReturnController extends BaseController {
         return ResponseEntity.ok(resultPage);
     }
 
+    @GetMapping("/checkEligibility")
+    public ResponseEntity<Boolean> checkReturnEligibility(
+            @RequestParam("orderId") Long orderId,
+            @RequestParam("orderItemId") Long orderItemId) {
+
+        // Check the eligibility for return using the ReturnService
+        boolean isEligible = returnService.checkReturnEligibility(orderId, orderItemId);
+
+        // Return the result as a ResponseEntity
+        return ResponseEntity.ok(isEligible);
+    }
+
 }

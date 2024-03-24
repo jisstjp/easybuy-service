@@ -21,5 +21,7 @@ public interface ReturnService {
     boolean deleteReturn(Long id,Long userId);
 
     public Page<ReturnDTO> searchReturns(ReturnSearchCriteriaDTO searchCriteria, Pageable pageable) ;
+    public boolean checkReturnEligibility(Long orderId, Long orderItemId);
 
-    }
+
+}

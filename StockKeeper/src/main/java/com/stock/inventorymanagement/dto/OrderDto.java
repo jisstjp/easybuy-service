@@ -20,6 +20,7 @@ public class OrderDto {
     private String shippingAddress;
     private List<OrderItemDto> orderItems;
     private LocalDateTime createdAt;
+    private boolean applyStoreCredit;
 
     public Long getId() {
         return id;
@@ -99,5 +100,13 @@ public class OrderDto {
 
     public void setStoreCreditApplied(BigDecimal storeCreditApplied) {
         this.storeCreditApplied = storeCreditApplied;
+    }
+
+    public boolean isApplyStoreCredit() {
+        return applyStoreCredit;
+    }
+
+    public void setApplyStoreCredit(boolean applyStoreCredit) {
+        this.applyStoreCredit = applyStoreCredit;
     }
 }

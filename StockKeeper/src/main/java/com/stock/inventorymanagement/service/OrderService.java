@@ -32,5 +32,4 @@ public interface OrderService {
 
      void generateAndSendOrderPdf(Long orderId, String recipientEmail,Long userId,boolean isAdminOrManager) throws MessagingException, DocumentException, IOException;
 
-
     }

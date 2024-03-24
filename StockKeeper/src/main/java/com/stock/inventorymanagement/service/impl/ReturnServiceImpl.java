@@ -1,9 +1,6 @@
 package com.stock.inventorymanagement.service.impl;
 
-import com.stock.inventorymanagement.domain.Credit;
-import com.stock.inventorymanagement.domain.Customer;
-import com.stock.inventorymanagement.domain.Return;
-import com.stock.inventorymanagement.domain.ReturnItem;
+import com.stock.inventorymanagement.domain.*;
 import com.stock.inventorymanagement.dto.ReturnDTO;
 import com.stock.inventorymanagement.dto.ReturnItemDTO;
 import com.stock.inventorymanagement.dto.ReturnSearchCriteriaDTO;
@@ -311,5 +308,33 @@ public class ReturnServiceImpl implements ReturnService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+
+    public boolean checkReturnEligibility(Long orderId, Long orderItemId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return false; // Order does not exist
+        }
+
+        // Check if the purchase date is null
+        LocalDateTime purchaseDate = order.getCreatedAt();
+        if (purchaseDate == null) {
+            return false; // Purchase date is null, ineligible for return
+        }
+
+        // Check if any return items exist for the given order item ID
+        boolean hasReturnItems = returnItemRepository.existsByOrderItemId(orderItemId);
+        if (hasReturnItems) {
+            return false; // Order item has already been returned
+        }
+
+        // Check if the purchase date is within the past year
+        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+        if (purchaseDate.isBefore(oneYearAgo)) {
+            return false; // Purchase was made more than 1 year ago
+        }
+
+        return true; // Eligible for return
     }
 }
