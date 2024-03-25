@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface IPdfGenerationService {
 
-    byte[] generateOrderSummaryPreviewPdf(Long cartId,Long userId,boolean isAdminOrManager) throws UnauthorizedException;
+    byte[] generateOrderSummaryPreviewPdf(Long cartId,Long userId,boolean isAdminOrManager,boolean storeCreditAdd) throws UnauthorizedException;
 
     byte[] generateOrderSummaryPdf(Long orderId,Long userId,boolean isAdminOrManager) throws DocumentException, IOException;
 }

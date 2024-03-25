@@ -1,5 +1,6 @@
 package com.stock.inventorymanagement.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -10,14 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.stock.inventorymanagement.dto.CartDto;
 import com.stock.inventorymanagement.dto.CartItemDto;
 import com.stock.inventorymanagement.service.CartItemService;
@@ -110,11 +104,11 @@ public class CartController extends BaseController {
     }
 
     @GetMapping(value = "/{cartId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> generateOrderSummaryPdf(HttpServletRequest request, Authentication authentication,@PathVariable Long cartId) {
+    public ResponseEntity<byte[]> generateOrderSummaryPdf(HttpServletRequest request, Authentication authentication,@PathVariable Long cartId, @RequestParam(value = "storeCreditAdd", required = false, defaultValue = "false") boolean storeCreditAdd) {
         try {
             boolean isAdminOrManager = isAdminOrManager(request, authentication);
             Long userId = getUserIdFromToken(request);
-            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId,userId,isAdminOrManager);
+            byte[] pdfContent = pdfGenerationService.generateOrderSummaryPreviewPdf(cartId,userId,isAdminOrManager,storeCreditAdd);
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=order_summary_" + cartId + ".pdf")
                     .contentType(MediaType.APPLICATION_PDF)
@@ -130,7 +124,7 @@ public class CartController extends BaseController {
         try {
             boolean isAdminOrManager = isAdminOrManager(request, authentication);
             Long userId = getUserIdFromToken(request);
-            cartService.generateAndSendCartPdf(cartEmailRequestDto.getCartId(), cartEmailRequestDto.getEmail(),userId,isAdminOrManager);
+            cartService.generateAndSendCartPdf(cartEmailRequestDto.getCartId(), cartEmailRequestDto.getEmail(),userId,isAdminOrManager,cartEmailRequestDto.isStoreCreditAdd());
             return ResponseEntity.ok("Cart summary email sent successfully to " + cartEmailRequestDto.getEmail());
         } catch (Exception e) {
             // Log the exception and return an appropriate error response

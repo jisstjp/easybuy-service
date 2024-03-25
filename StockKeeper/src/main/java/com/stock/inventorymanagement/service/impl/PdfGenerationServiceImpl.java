@@ -5,8 +5,11 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+import com.stock.inventorymanagement.domain.Customer;
 import com.stock.inventorymanagement.dto.*;
 import com.stock.inventorymanagement.exception.UnauthorizedException;
+import com.stock.inventorymanagement.repository.CustomerRepository;
+import com.stock.inventorymanagement.service.CreditService;
 import com.stock.inventorymanagement.service.IPdfGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -24,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -44,8 +48,14 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private CreditService creditService;
+
     @Override
-    public byte[] generateOrderSummaryPreviewPdf(Long cartId, Long userId, boolean isAdminOrManager)  throws UnauthorizedException  {
+    public byte[] generateOrderSummaryPreviewPdf(Long cartId, Long userId, boolean isAdminOrManager,boolean storeCreditAdd)  throws UnauthorizedException  {
         Document document = new Document();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
@@ -73,7 +83,7 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
             addCustomerDetails(document, customerDto);
 
             // Adding Cart Items and Calculating Prices
-            addCartItems(document, cartId);
+            addCartItems(document, cartId,storeCreditAdd,userId);
 
             // Footer
             addFooter(document);
@@ -168,17 +178,15 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
     }
 
 
-    private void addCartItems(Document document, Long cartId) throws DocumentException {
+    private void addCartItems(Document document, Long cartId, boolean storeCreditApplied, Long userId) throws DocumentException {
         List<CartItemDto> cartItems = cartItemService.getCartItemsByCartId(cartId);
-        // Adjusted column widths for uniformity
         PdfPTable table = new PdfPTable(new float[]{4f, 2f, 2f, 2f, 2f});
         table.setWidthPercentage(100);
 
-        // Define table headers with improved and lighter styling
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-        BaseColor headerBackgroundColor = new BaseColor(245, 245, 245); // Very light gray for a softer appearance
+        BaseColor headerBackgroundColor = new BaseColor(245, 245, 245);
 
-        // Changed header title and order
+        // Add table headers
         Stream.of("Product Name", "Retail Price", "Quantity", "Price per Item", "Subtotal")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell(new Phrase(columnTitle, headerFont));
@@ -191,16 +199,15 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
 
         BigDecimal total = BigDecimal.ZERO;
 
-        // Adding cart items with enhanced styling
+        // Adding cart items to the table
         for (CartItemDto item : cartItems) {
             String productName = productService.getProductNameById(item.getProductId());
             BigDecimal price = safelyFetchSalesPrice(item.getProductId(), item.getPrice());
-            BigDecimal retailPrice = fetchSuggestedPrice(item.getProductId(), price); // Renamed variable for clarity
+            BigDecimal retailPrice = fetchSuggestedPrice(item.getProductId(), price);
             BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
 
-            // Adjusted cell addition order and alignment
             addTableCell(table, productName, Element.ALIGN_LEFT);
-            addTableCell(table, "$" + retailPrice.toPlainString(), Element.ALIGN_RIGHT); // Retail Price
+            addTableCell(table, "$" + retailPrice.toPlainString(), Element.ALIGN_RIGHT);
             addTableCell(table, String.valueOf(item.getQuantity()), Element.ALIGN_CENTER);
             addTableCell(table, "$" + price.toPlainString(), Element.ALIGN_RIGHT);
             addTableCell(table, "$" + lineTotal.toPlainString(), Element.ALIGN_RIGHT);
@@ -209,9 +216,45 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         }
 
         document.add(table);
+
+        // Define a font for highlighting
+        Font highlightFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+
+        // Check and apply store credit if applicable
+        BigDecimal totalCredits = BigDecimal.ZERO;
+        if (storeCreditApplied) {
+            Optional<Customer> optionalCustomer = customerRepository.findByUserId(userId);
+            if (optionalCustomer.isPresent()) {
+                Customer customer = optionalCustomer.get();
+                totalCredits = creditService.getTotalCredits(customer.getId());
+                total = total.subtract(totalCredits);
+            }
+        }
+
+        // If store credit was applied, add a highlighted line outside the table before the total cost
+        if (storeCreditApplied && totalCredits.compareTo(BigDecimal.ZERO) > 0) {
+            Paragraph storeCreditParagraph = new Paragraph("Store Credit Used: -$" + totalCredits.toPlainString(), highlightFont);
+            storeCreditParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(storeCreditParagraph);
+        }
+
+        // Display total cost in a highlighted fashion
+        Paragraph totalCostParagraph = new Paragraph("Total Cost: $" + total.toPlainString(), highlightFont);
+        totalCostParagraph.setAlignment(Element.ALIGN_RIGHT);
+        document.add(totalCostParagraph);
         document.add(Chunk.NEWLINE);
-        document.add(new Paragraph("Total Cost: $" + total.toPlainString(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-        document.add(Chunk.NEWLINE);
+    }
+
+
+    private void addTableCell(PdfPTable table, String text, int alignment, int... colspan) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setPadding(8);
+        if (colspan.length > 0) {
+            cell.setColspan(colspan[0]);
+        }
+        table.addCell(cell);
     }
 
 
