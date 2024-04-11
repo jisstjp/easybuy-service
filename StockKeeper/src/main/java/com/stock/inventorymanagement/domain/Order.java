@@ -42,6 +42,9 @@ public class Order {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    @Column(name = "credit_applied")
+    private BigDecimal creditApplied;
+
     public Long getId() {
 	return id;
     }
@@ -106,4 +109,11 @@ public class Order {
 	this.shippingAddress = shippingAddress;
     }
 
+    public BigDecimal getCreditApplied() {
+        return creditApplied;
+    }
+
+    public void setCreditApplied(BigDecimal creditApplied) {
+        this.creditApplied = creditApplied;
+    }
 }

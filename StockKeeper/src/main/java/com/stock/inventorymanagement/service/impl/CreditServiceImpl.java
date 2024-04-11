@@ -92,4 +92,33 @@ public class CreditServiceImpl implements CreditService {
         }
         return totalCredits;
     }
+
+    public void subtractCredit(Long customerId, BigDecimal amount) {
+        List<Credit> credits = creditRepository.findByCustomerIdAndStatus(customerId, "ACTIVE");
+
+        BigDecimal amountToSubtract = amount;
+        for (Credit credit : credits) {
+            if (amountToSubtract.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
+
+            BigDecimal creditAmount = credit.getAmount();
+            if (creditAmount.compareTo(amountToSubtract) >= 0) {
+                credit.setAmount(creditAmount.subtract(amountToSubtract));
+                credit.setStatus(credit.getAmount().compareTo(BigDecimal.ZERO) == 0 ? "USED" : "ACTIVE");
+                amountToSubtract = BigDecimal.ZERO;
+            } else {
+                amountToSubtract = amountToSubtract.subtract(creditAmount);
+                credit.setAmount(BigDecimal.ZERO);
+                credit.setStatus("USED");
+            }
+            creditRepository.save(credit);
+        }
+
+        if (amountToSubtract.compareTo(BigDecimal.ZERO) > 0) {
+            // Handle the case where there isn't enough credit
+            throw new RuntimeException("Insufficient credit available");
+        }
+    }
+
 }

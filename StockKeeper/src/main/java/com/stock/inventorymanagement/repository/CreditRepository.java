@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface CreditRepository extends JpaRepository<Credit, Long> {
     List<Credit> findByCustomerIdAndStatusAndExpiryDateAfter(Long customerId, String status, Date currentDate);
+    List<Credit> findByCustomerIdAndStatus(Long customerId, String status);
 }
+

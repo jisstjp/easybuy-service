@@ -12,4 +12,6 @@ public interface CreditService {
     CreditDto getCreditById(Long id);
     void deleteCredit(Long id);
     public BigDecimal getTotalCredits(Long customerId);
+    public void subtractCredit(Long customerId, BigDecimal amount);
+
 }

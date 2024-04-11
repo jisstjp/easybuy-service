@@ -2,10 +2,7 @@ package com.stock.inventorymanagement.service.impl;
 
 import com.itextpdf.text.DocumentException;
 import com.stock.inventorymanagement.domain.*;
-import com.stock.inventorymanagement.dto.OrderDto;
-import com.stock.inventorymanagement.dto.OrderItemDto;
-import com.stock.inventorymanagement.dto.OrderSearchCriteria;
-import com.stock.inventorymanagement.dto.PaymentDto;
+import com.stock.inventorymanagement.dto.*;
 import com.stock.inventorymanagement.enums.PriceType;
 import com.stock.inventorymanagement.exception.ResourceNotFoundException;
 import com.stock.inventorymanagement.mapper.OrderItemMapper;
@@ -83,6 +80,10 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     CustomerService customerService;
 
+    @Autowired
+    private CreditService creditService;
+
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public OrderDto createOrder(Long userId, OrderDto orderDto) {
@@ -94,15 +95,18 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal totalPrice = calculateTotalSalesPriceForCart(cart);
 
-        BigDecimal availableStoreCredit = customerService.getAvailableStoreCredit(userId);
-        BigDecimal desiredCreditToApply = Optional.ofNullable(orderDto.getStoreCreditApplied()).orElse(BigDecimal.ZERO);
-        desiredCreditToApply = desiredCreditToApply.min(availableStoreCredit).min(totalPrice); // Do not exceed available credit or total price
-        totalPrice = totalPrice.subtract(desiredCreditToApply);
+        CustomerDto  customerDto = customerService.getCustomerById(userId);
 
-        //customerService.updateStoreCredit(userId, availableStoreCredit.subtract(desiredCreditToApply));
+        BigDecimal availableStoreCredit = creditService.getTotalCredits(customerDto.getId());
+
+        BigDecimal desiredCreditToApply = Optional.ofNullable(orderDto.getStoreCreditApplied()).orElse(BigDecimal.ZERO);
+        desiredCreditToApply = desiredCreditToApply.min(availableStoreCredit).min(totalPrice);
+        totalPrice = totalPrice.subtract(desiredCreditToApply);
+        creditService.subtractCredit(userId, desiredCreditToApply);
 
         Order order = new Order();
         order.setUser(user);
+        order.setCreditApplied(desiredCreditToApply);
         order.setTotalPrice(totalPrice);
         order.setOrderStatus(Optional.ofNullable(orderDto.getOrderStatus()).orElse("Pending"));
         String shippingAddress = orderDto.getShippingAddress();
