@@ -393,3 +393,20 @@ CREATE TABLE returns (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE sales_person (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) ,
+    last_name VARCHAR(255) ,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(20),
+    department VARCHAR(255),
+    position VARCHAR(255),
+    hire_date DATE,
+    territory VARCHAR(255),
+    sales_quota DECIMAL(10, 2),
+    sales_ytd DECIMAL(10, 2),
+    is_active TINYINT(1) ,
+    last_login TIMESTAMP
+);
