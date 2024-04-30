@@ -18,6 +18,6 @@ public interface CartService {
     void deleteCart(Long cartId);
     public void generateAndSendCartPdf(Long cartId, String recipientEmail,Long userId,boolean isAdminOrManager,boolean storeCreditAdd) throws MessagingException;
 
-    public void subtractCredit(Long customerId, BigDecimal amount);
+    //public void subtractCredit(Long customerId, BigDecimal amount);
 
 }

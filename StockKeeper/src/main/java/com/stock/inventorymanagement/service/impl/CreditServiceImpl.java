@@ -34,7 +34,7 @@ public class CreditServiceImpl implements CreditService {
     public CreditDto createCredit(CreditDto creditDto) {
         Credit credit = creditMapper.convertToEntity(creditDto);
         credit = creditRepository.save(credit);
-        updateCustomerStoreCredit(credit.getCustomer(), credit.getAmount(), true);
+       // updateCustomerStoreCredit(credit.getCustomer(), credit.getAmount(), true);
         return creditMapper.convertToDTO(credit);
     }
 
@@ -46,7 +46,7 @@ public class CreditServiceImpl implements CreditService {
                 .orElseThrow(() -> new RuntimeException("Credit not found"));
         creditMapper.updateEntityFromDto(creditDto, existingCredit);
         existingCredit = creditRepository.save(existingCredit);
-        updateCustomerStoreCredit(existingCredit.getCustomer(), creditDto.getAmount(), false);
+       // updateCustomerStoreCredit(existingCredit.getCustomer(), creditDto.getAmount(), false);
         return creditMapper.convertToDTO(existingCredit);
     }
 
@@ -67,6 +67,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public void deleteCredit(Long id) {
+
         creditRepository.deleteById(id);
     }
 

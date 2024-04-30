@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/returns")
@@ -29,7 +30,17 @@ public class ReturnController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReturn);
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/batch")
+    public ResponseEntity<List<ReturnDTO>> initiateReturns(HttpServletRequest request, @RequestBody List<ReturnDTO> returnDTOs) {
+        Long userId = getUserIdFromToken(request);
+        List<ReturnDTO> createdReturns = returnDTOs.stream()
+                .map(returnDTO -> returnService.createReturn(returnDTO, userId))
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdReturns);
+    }
+
+
+        @GetMapping("/{id}")
     public ResponseEntity<ReturnDTO> getReturn(@PathVariable Long id) {
         ReturnDTO returnDTO = returnService.getReturn(id);
         if (returnDTO != null) {
