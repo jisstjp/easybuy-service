@@ -410,3 +410,11 @@ CREATE TABLE sales_person (
     is_active TINYINT(1) ,
     last_login TIMESTAMP
 );
+
+CREATE TABLE `customer_sales_person` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `customer_id` bigint NOT NULL,
+  `sales_person_id` bigint NOT NULL,
+  `assigned_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+)
