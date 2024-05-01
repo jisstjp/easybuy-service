@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.controllers;
 
 import com.stock.inventorymanagement.dto.SalesPersonDTO;
+import com.stock.inventorymanagement.service.CustomerSalesPersonService;
 import com.stock.inventorymanagement.service.SalesPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,12 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/salespersons")
 public class SalesPersonController {
 
     private final SalesPersonService salesPersonService;
+
+    @Autowired
+    private CustomerSalesPersonService customerSalesPersonService;
 
     @Autowired
     public SalesPersonController(SalesPersonService salesPersonService) {
@@ -60,5 +65,11 @@ public class SalesPersonController {
     public ResponseEntity<Void> deleteSalesPerson(@PathVariable Long id) {
         salesPersonService.deleteSalesPersonById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{salesPersonId}/customers")
+    public ResponseEntity<Map<Long, Long>> getCustomerUserIdsBySalesPersonId(@PathVariable Long salesPersonId) {
+        Map<Long, Long> customerUserIds = customerSalesPersonService.findCustomerIdsBySalesPersonId(salesPersonId);
+        return ResponseEntity.ok(customerUserIds);
     }
 }
