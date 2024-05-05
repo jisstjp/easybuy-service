@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,6 +27,7 @@ public class ReturnController extends BaseController {
     @PostMapping
     public ResponseEntity<ReturnDTO> initiateReturn(HttpServletRequest request, @RequestBody ReturnDTO returnDTO) {
         Long userId = getUserIdFromToken(request);
+        returnDTO.setCorrelationId(UUID.randomUUID().toString());
         ReturnDTO createdReturn = returnService.createReturn(returnDTO,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReturn);
     }
@@ -33,8 +35,12 @@ public class ReturnController extends BaseController {
     @PostMapping("/batch")
     public ResponseEntity<List<ReturnDTO>> initiateReturns(HttpServletRequest request, @RequestBody List<ReturnDTO> returnDTOs) {
         Long userId = getUserIdFromToken(request);
+        String correlationId = UUID.randomUUID().toString();
         List<ReturnDTO> createdReturns = returnDTOs.stream()
-                .map(returnDTO -> returnService.createReturn(returnDTO, userId))
+                .map(returnDTO -> {
+                    returnDTO.setCorrelationId(correlationId);
+                    return returnService.createReturn(returnDTO, userId);
+                })
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReturns);
     }

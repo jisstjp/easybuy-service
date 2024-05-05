@@ -1,6 +1,7 @@
 package com.stock.inventorymanagement.controllers;
 
 import com.stock.inventorymanagement.dto.SalesPersonDTO;
+import com.stock.inventorymanagement.dto.SalesPersonPublicDTO;
 import com.stock.inventorymanagement.service.CustomerSalesPersonService;
 import com.stock.inventorymanagement.service.SalesPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/salespersons")
@@ -46,9 +48,30 @@ public class SalesPersonController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SalesPersonDTO>> getAllSalesPersons() {
+    public ResponseEntity<List<SalesPersonPublicDTO>> getAllSalesPersons() {
         List<SalesPersonDTO> salesPersonDtos = salesPersonService.findAllSalesPersons();
-        return new ResponseEntity<>(salesPersonDtos, HttpStatus.OK);
+        List<SalesPersonPublicDTO> publicDtos = salesPersonDtos.stream()
+                .map(this::convertToPublicDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(publicDtos, HttpStatus.OK);
+    }
+
+    private SalesPersonPublicDTO convertToPublicDTO(SalesPersonDTO salesPersonDto) {
+        SalesPersonPublicDTO publicDto = new SalesPersonPublicDTO();
+        publicDto.setId(salesPersonDto.getId());
+        publicDto.setFirstName(salesPersonDto.getFirstName());
+        publicDto.setLastName(salesPersonDto.getLastName());
+        publicDto.setEmail(salesPersonDto.getEmail());
+        publicDto.setPhone(salesPersonDto.getPhone());
+        publicDto.setDepartment(salesPersonDto.getDepartment());
+        publicDto.setPosition(salesPersonDto.getPosition());
+        publicDto.setHireDate(salesPersonDto.getHireDate());
+        publicDto.setTerritory(salesPersonDto.getTerritory());
+        publicDto.setSalesQuota(salesPersonDto.getSalesQuota());
+        publicDto.setSalesYTD(salesPersonDto.getSalesYTD());
+        publicDto.setIsActive(salesPersonDto.getIsActive());
+        publicDto.setLastLogin(salesPersonDto.getLastLogin());
+        return publicDto;
     }
 
     @PutMapping("/{id}")

@@ -27,6 +27,16 @@ public class ReturnItem {
     @Column(name = "comments")
     private String comments;
 
+
+    @Column(name = "product_id")
+    private Integer productId;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -74,5 +84,29 @@ public class ReturnItem {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -124,6 +124,13 @@ public class OrderServiceImpl implements OrderService {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);
             orderItem.setProductId(cartItem.getProductId());
+            // Fetch product details
+            Optional<Product> productOpt = productRepository.findByIdAndIsDeletedFalse(cartItem.getProductId());
+            if (productOpt.isPresent()) {
+                Product product = productOpt.get();
+                orderItem.setProductName(product.getName());
+                orderItem.setImageUrl(product.getImageUrl());
+            }
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(safelyFetchSalesPrice(cartItem.getProductId(), cartItem.getPrice()));
             orderItem.setDeleted(false);
@@ -328,6 +335,12 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         OrderDto orderDto = orderMapper.toDto(order);
+
+        if (order.getCreditApplied() != null
+                && order.getCreditApplied().compareTo(BigDecimal.ZERO) > 0){
+            orderDto.setApplyStoreCredit(true);
+            orderDto.setStoreCreditApplied(order.getCreditApplied());
+        }
 
         List<OrderItemDto> orderItemDtos = orderItemRepository.findByOrderId(orderId).stream()
                 .map(orderItem -> orderItemMapper.toDto(orderItem)).collect(Collectors.toList());

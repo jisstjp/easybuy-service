@@ -60,6 +60,7 @@ public class ReturnServiceImpl implements ReturnService {
         returnEntity.setCreditDate(now); // Set current date as credit date
         returnEntity.setCreatedAt(now); // Set current date as creation date
         returnEntity.setUpdatedAt(now);
+        returnEntity.setCorrelationId(returnDTO.getCorrelationId());
 
         if (returnDTO.getReturnItems() != null) {
             BigDecimal totalCreditAmount = BigDecimal.ZERO;
@@ -87,6 +88,7 @@ public class ReturnServiceImpl implements ReturnService {
         savedReturnDTO.setComments(savedReturn.getComments());
         savedReturnDTO.setCreditAmount(savedReturn.getCreditAmount());
         savedReturnDTO.setReturnItems(returnDTO.getReturnItems());
+        savedReturnDTO.setCorrelationId(savedReturn.getCorrelationId());
 
         return savedReturnDTO;
     }
@@ -108,6 +110,7 @@ public class ReturnServiceImpl implements ReturnService {
             returnDTO.setReason(returnEntity.getReason());
             returnDTO.setComments(returnEntity.getComments());
             returnDTO.setCreditAmount(returnEntity.getCreditAmount());
+            returnDTO.setCorrelationId(returnEntity.getCorrelationId());
 
             // Convert associated ReturnItem entities to DTOs and set them in the ReturnDTO
             List<ReturnItemDTO> returnItemDTOs = returnEntity.getReturnItems().stream()
@@ -151,6 +154,7 @@ public class ReturnServiceImpl implements ReturnService {
             returnDTO.setReason(returnEntity.getReason());
             returnDTO.setComments(returnEntity.getComments());
             returnDTO.setCreditAmount(returnEntity.getCreditAmount());
+            returnDTO.setCorrelationId(returnEntity.getCorrelationId());
 
             // Convert associated ReturnItem entities to DTOs and set them in the ReturnDTO
             List<ReturnItemDTO> returnItemDTOs = returnEntity.getReturnItems().stream()
@@ -264,7 +268,7 @@ public class ReturnServiceImpl implements ReturnService {
         returnDTO.setReason(returnEntity.getReason());
         returnDTO.setComments(returnEntity.getComments());
         returnDTO.setCreditAmount(returnEntity.getCreditAmount());
-
+        returnDTO.setCorrelationId(returnEntity.getCorrelationId());
         // Convert associated ReturnItem entities to DTOs and set them in the ReturnDTO
         List<ReturnItemDTO> returnItemDTOs = returnEntity.getReturnItems().stream()
                 .map(this::convertReturnItemToDTO)

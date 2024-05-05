@@ -13,6 +13,8 @@ public class ReturnDTO {
     private String comments;
     private BigDecimal creditAmount;
     private List<ReturnItemDTO> returnItems;
+    private String correlationId;
+
 
 
     public Long getId() {
@@ -69,5 +71,13 @@ public class ReturnDTO {
 
     public void setReturnItems(List<ReturnItemDTO> returnItems) {
         this.returnItems = returnItems;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 }

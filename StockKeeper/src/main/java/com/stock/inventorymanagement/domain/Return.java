@@ -49,6 +49,9 @@ public class Return {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    @Column(name = "correlation_id")
+    private String correlationId;
+
     public Long getId() {
         return id;
     }
@@ -151,5 +154,13 @@ public class Return {
 
     public void setReturnItems(List<ReturnItem> returnItems) {
         this.returnItems = returnItems;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 }

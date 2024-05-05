@@ -27,6 +27,12 @@ public class OrderItem {
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
     private int quantity;
 
     private BigDecimal price;
@@ -104,4 +110,19 @@ public class OrderItem {
 	this.isDeleted = isDeleted;
     }
 
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

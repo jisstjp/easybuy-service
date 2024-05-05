@@ -437,6 +437,12 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         total.setSpacingBefore(5f);
         document.add(total);
 
+        if (orderDto.getStoreCreditApplied() != null && orderDto.getStoreCreditApplied().compareTo(BigDecimal.ZERO) > 0) {
+            Paragraph storeCredit = new Paragraph("Store Credit Applied: $" + orderDto.getStoreCreditApplied().toPlainString(), new Font(Font.FontFamily.HELVETICA, 12));
+            storeCredit.setAlignment(Element.ALIGN_RIGHT);
+            document.add(storeCredit);
+        }
+
         document.add(new Paragraph(" ", new Font(Font.FontFamily.HELVETICA, 8)));
     }
 

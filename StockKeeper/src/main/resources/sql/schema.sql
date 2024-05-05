@@ -418,3 +418,6 @@ CREATE TABLE `customer_sales_person` (
   `assigned_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
 )
+ALTER TABLE order_items
+ADD COLUMN product_name VARCHAR(255),
+ADD COLUMN image_url VARCHAR(255);
