@@ -40,10 +40,19 @@ public class SalesPersonController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+
     @GetMapping("/email/{email}")
     public ResponseEntity<SalesPersonDTO> getSalesPersonByEmail(@PathVariable String email) {
         return salesPersonService.findSalesPersonByEmail(email)
                 .map(salesPersonDto -> new ResponseEntity<>(salesPersonDto, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<SalesPersonPublicDTO> getSalesPersonPublicByUserId(@PathVariable Long userId) {
+        return salesPersonService.findSalesPersonByUserId(userId)
+                .map(this::convertToPublicDTO) // Convert to public DTO
+                .map(publicDto -> new ResponseEntity<>(publicDto, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 

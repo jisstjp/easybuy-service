@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 
 import com.stock.inventorymanagement.domain.Customer;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class CustomerSpecification {
 
@@ -34,7 +38,7 @@ public class CustomerSpecification {
 		return (root, criteriaQuery, criteriaBuilder) -> {
 			Path<?> fieldPath = root.get(field); // Use Path<?>
 
-			if (CommonUtils.isNumeric(value)) {
+			if (CommonUtils.isNumericOrCommaSeparatedNumeric(value)) {
 				// Handle numeric searches
 				return handleNumericSearch(fieldPath, value, operator, criteriaBuilder);
 			} else {
@@ -51,6 +55,7 @@ public class CustomerSpecification {
 		// Cast fieldPath to the appropriate numeric type (e.g., Double, Integer) based on your field's data type
 		Path<Number> numericFieldPath = (Path<Number>) fieldPath;
 
+
 		// Implement handling for numeric searches based on the provided operator
 		switch (operator) {
 			case EQUALS:
@@ -59,6 +64,13 @@ public class CustomerSpecification {
 				return criteriaBuilder.gt(numericFieldPath, Double.parseDouble(value));
 			case LESS_THAN:
 				return criteriaBuilder.lt(numericFieldPath, Double.parseDouble(value));
+			case IN_OPERATOR :
+				List<Double> numbers = Arrays.stream(value.split(","))
+						.map(String::trim)
+						.map(Double::valueOf)
+						.collect(Collectors.toList());;
+				return fieldPath.in(numbers);
+
 			// Add more cases as needed
 			default:
 				throw new IllegalArgumentException("Unsupported operator for numeric field: " + operator);

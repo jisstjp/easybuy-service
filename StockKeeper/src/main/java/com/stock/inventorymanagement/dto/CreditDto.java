@@ -11,6 +11,7 @@ public class CreditDto {
     private String status;
     private Date issueDate;
     private Date expiryDate;
+    private String creditDescription;
 
     public Long getCustomerId() {
         return customerId;
@@ -58,5 +59,13 @@ public class CreditDto {
 
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public String getCreditDescription() {
+        return creditDescription;
+    }
+
+    public void setCreditDescription(String creditDescription) {
+        this.creditDescription = creditDescription;
     }
 }

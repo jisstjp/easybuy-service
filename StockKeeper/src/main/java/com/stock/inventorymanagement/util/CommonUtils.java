@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Component
@@ -18,6 +19,12 @@ public class CommonUtils {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static boolean isNumericOrCommaSeparatedNumeric(String value) {
+        return Arrays.stream(value.split(","))
+                .map(String::trim)
+                .allMatch(CommonUtils::isNumeric);
     }
 
     public static String decryptPassword(String encryptedPassword, String encryptionKey) throws Exception {

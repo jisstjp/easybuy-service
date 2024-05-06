@@ -32,6 +32,9 @@ public class Credit {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiryDate;
 
+    @Column(name = "credit_description")
+    private String creditDescription;
+
     public Long getId() {
         return id;
     }
@@ -86,5 +89,13 @@ public class Credit {
 
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public String getCreditDescription() {
+        return creditDescription;
+    }
+
+    public void setCreditDescription(String creditDescription) {
+        this.creditDescription = creditDescription;
     }
 }

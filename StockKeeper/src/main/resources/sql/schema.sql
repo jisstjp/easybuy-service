@@ -421,3 +421,11 @@ CREATE TABLE `customer_sales_person` (
 ALTER TABLE order_items
 ADD COLUMN product_name VARCHAR(255),
 ADD COLUMN image_url VARCHAR(255);
+ALTER TABLE returns
+ADD COLUMN correlation_id VARCHAR(255);
+
+ALTER TABLE credits
+ADD COLUMN credit_description VARCHAR(255);
+
+ALTER TABLE sales_person
+ADD COLUMN user_id BIGINT;

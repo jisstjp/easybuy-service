@@ -113,6 +113,7 @@ public class CustomerController extends BaseController {
 
     private CustomerInfoDto mapCustomerToCustomerInfoDto(CustomerDto customer) {
         CustomerInfoDto customerInfoDto = new CustomerInfoDto();
+        customerInfoDto.setId(customer.getId());
         customerInfoDto.setFirstName(customer.getFirstName());
         customerInfoDto.setLastName(customer.getLastName());
         customerInfoDto.setAddressLine1(customer.getAddressLine1());

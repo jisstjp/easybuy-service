@@ -38,10 +38,12 @@ public class SalesPersonServiceImpl implements SalesPersonService {
     @Transactional(propagation = Propagation.REQUIRED)
     public SalesPersonDTO saveSalesPerson(SalesPersonDTO salesPersonDto) {
         SalesPerson salesPerson = convertToEntity(salesPersonDto);
+        User newUser = createUserForSalesPerson(salesPersonDto);
+        salesPerson.setUserId(newUser.getId());  // Set the new user ID
         SalesPerson savedSalesPerson = salesPersonRepository.save(salesPerson);
-        createUserForSalesPerson(salesPersonDto);
         return convertToDto(savedSalesPerson);
     }
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -65,6 +67,11 @@ public class SalesPersonServiceImpl implements SalesPersonService {
     @Override
     public Optional<SalesPersonDTO> findSalesPersonByEmail(String email) {
         return salesPersonRepository.findByEmail(email).map(this::convertToDto);
+    }
+
+    @Override
+    public Optional<SalesPersonDTO> findSalesPersonByUserId(Long userId) {
+        return salesPersonRepository.findByUserId(userId).map(this::convertToDto);
     }
 
     @Override
@@ -137,25 +144,26 @@ public class SalesPersonServiceImpl implements SalesPersonService {
     }
 
 
-    private void createUserForSalesPerson(SalesPersonDTO salesPerson) {
+    private User createUserForSalesPerson(SalesPersonDTO salesPersonDto) {
         User newUser = new User();
-        newUser.setUsername(salesPerson.getUserName());
-        newUser.setPassword(salesPerson.getPassword());
-        newUser.setEmail(salesPerson.getEmail());
-        newUser.setFirstName(salesPerson.getFirstName());
-        newUser.setLastName(salesPerson.getLastName());
+        newUser.setUsername(salesPersonDto.getUserName());
+        newUser.setPassword(salesPersonDto.getPassword());
+        newUser.setEmail(salesPersonDto.getEmail());
+        newUser.setFirstName(salesPersonDto.getFirstName());
+        newUser.setLastName(salesPersonDto.getLastName());
 
         Role role = roleRepository.findByName("SALES_PERSON");
         if (role != null) {
             newUser.getRoles().add(role);
         } else {
-           // log.warn("Role SALES_PERSON not found and is required for creating a user.");
+            // log.warn("Role SALES_PERSON not found and is required for creating a user.");
             // Optionally throw an exception or handle this case as required
         }
 
         // Save the new user to the user repository
-        userRepository.save(newUser);
-
-        // Optionally, perform other post-user-creation actions (like sending email notifications)
+        return userRepository.save(newUser);
     }
+
+
+
 }

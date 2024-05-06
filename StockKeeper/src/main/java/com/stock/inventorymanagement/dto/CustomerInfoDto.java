@@ -3,6 +3,8 @@ package com.stock.inventorymanagement.dto;
 import java.math.BigDecimal;
 
 public class CustomerInfoDto {
+
+    private Long id;
     private String firstName;
     private String lastName;
     private String addressLine1;
@@ -111,5 +113,13 @@ public class CustomerInfoDto {
 
     public void setStoreCredit(BigDecimal storeCredit) {
         this.storeCredit = storeCredit;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

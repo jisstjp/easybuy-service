@@ -52,6 +52,12 @@ public class CustomerSalesPersonServiceImpl implements CustomerSalesPersonServic
             Customer customer = customerRepository.findById(customerId)
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
 
+            // Check if a relationship already exists
+            boolean relationshipExists = customerSalesPersonRepository.existsByCustomerAndSalesPerson(customer, salesPerson);
+            if (relationshipExists) {
+                throw new IllegalArgumentException("Relationship already exists between Customer ID: " + customerId + " and SalesPerson ID: " + relationshipDto.getSalesPersonId());
+            }
+
             CustomerSalesPerson relationship = new CustomerSalesPerson();
             relationship.setCustomer(customer);
             relationship.setSalesPerson(salesPerson);
@@ -95,7 +101,6 @@ public class CustomerSalesPersonServiceImpl implements CustomerSalesPersonServic
     }
 
     public Map<Long, Long> findCustomerIdsBySalesPersonId(Long salesPersonId) {
-
         List<CustomerSalesPerson> relationships = customerSalesPersonRepository.findBySalesPersonId(salesPersonId);
         return relationships.stream()
                 .filter(relationship -> relationship.getCustomer().getUser() != null)
@@ -108,4 +113,33 @@ public class CustomerSalesPersonServiceImpl implements CustomerSalesPersonServic
 
 
     }
+
+    @Transactional
+    @Override
+    public  List<CustomerSalesPersonDTO> createOrUpdateRelationships(CustomerSalesPersonDTO relationshipDto) {
+        SalesPerson salesPerson = salesPersonRepository.findById(relationshipDto.getSalesPersonId())
+                .orElseThrow(() -> new IllegalArgumentException("SalesPerson not found with ID: " + relationshipDto.getSalesPersonId()));
+
+        // Remove existing relationships for the SalesPerson
+        customerSalesPersonRepository.deleteAllBySalesPerson(salesPerson);
+
+        List<CustomerSalesPersonDTO> createdRelationships = new ArrayList<>();
+        for (Long customerId : relationshipDto.getCustomerIds()) {
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
+
+            CustomerSalesPerson relationship = new CustomerSalesPerson();
+            relationship.setCustomer(customer);
+            relationship.setSalesPerson(salesPerson);
+            relationship.setAssignedDate(relationshipDto.getAssignedDate());
+            customerSalesPersonRepository.save(relationship);
+
+            createdRelationships.add(convertToDto(relationship));
+        }
+
+        return createdRelationships;
+    }
+
+
+
 }

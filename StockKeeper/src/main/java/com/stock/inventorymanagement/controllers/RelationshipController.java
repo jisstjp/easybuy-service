@@ -20,6 +20,8 @@ public class RelationshipController {
         return ResponseEntity.ok(newRelationship);
     }
 
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRelationship(@PathVariable Long id) {
         customerSalesPersonService.deleteRelationship(id);
@@ -44,4 +46,12 @@ public class RelationshipController {
         List<CustomerSalesPersonDTO> newRelationships = customerSalesPersonService.createMultipleRelationships(relationshipDto);
         return ResponseEntity.ok(newRelationships);
     }
+
+    @PutMapping("/salesperson/assign-customers")
+    public ResponseEntity<List<CustomerSalesPersonDTO>> updateMultipleRelationships(@RequestBody CustomerSalesPersonDTO relationshipDto) {
+        List<CustomerSalesPersonDTO> updatedRelationships = customerSalesPersonService.createOrUpdateRelationships(relationshipDto);
+        return ResponseEntity.ok(updatedRelationships);
+    }
+
+
 }

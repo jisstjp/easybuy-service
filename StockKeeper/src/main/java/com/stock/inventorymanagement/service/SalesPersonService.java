@@ -13,4 +13,6 @@ public interface SalesPersonService {
     List<SalesPersonDTO> findAllSalesPersons();
     void deleteSalesPersonById(Long id);
     public SalesPersonDTO updateSalesPerson(Long id, SalesPersonDTO salesPersonDto);
-}
+    public Optional<SalesPersonDTO> findSalesPersonByUserId(Long userId) ;
+
+    }

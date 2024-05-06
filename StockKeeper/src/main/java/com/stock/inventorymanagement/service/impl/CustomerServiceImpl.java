@@ -166,7 +166,6 @@ public class CustomerServiceImpl implements CustomerService {
         Specification<Customer> specification = customerSpecification.searchCustomers(searchCriteria.getField(),
                 searchCriteria.getValue(), searchCriteria.getOperator());
         Page<Customer> customerPage = customerRepository.findAll(specification, pageable);
-
         Page<CustomerDto> customerDtoPage = customerPage.map(customerMapper::toDto);
         customerDtoPage.forEach(customerDto -> {
             Customer customer = customerRepository.findById(customerDto.getId()).orElse(null);

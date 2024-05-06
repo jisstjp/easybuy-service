@@ -52,6 +52,9 @@ public class SalesPerson {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastLogin;
 
+    @Column(name = "user_id")  // New field
+    private Long userId;
+
     public Long getId() {
         return id;
     }
@@ -154,5 +157,14 @@ public class SalesPerson {
 
     public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }
