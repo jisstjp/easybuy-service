@@ -220,22 +220,31 @@ public class PdfGenerationServiceImpl implements IPdfGenerationService {
         // Define a font for highlighting
         Font highlightFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
 
-        // Check and apply store credit if applicable
-        BigDecimal totalCredits = BigDecimal.ZERO;
+        BigDecimal totalAvailableCredits = BigDecimal.ZERO;
+        BigDecimal appliedStoreCredit = BigDecimal.ZERO;
+
         if (storeCreditApplied) {
             Optional<Customer> optionalCustomer = customerRepository.findByUserId(userId);
             if (optionalCustomer.isPresent()) {
                 Customer customer = optionalCustomer.get();
-                totalCredits = creditService.getTotalCredits(customer.getId());
-                total = total.subtract(totalCredits);
+                totalAvailableCredits = creditService.getTotalCredits(customer.getId());
+                appliedStoreCredit = totalAvailableCredits.min(total);
+                total = total.subtract(appliedStoreCredit);
             }
         }
 
-        // If store credit was applied, add a highlighted line outside the table before the total cost
-        if (storeCreditApplied && totalCredits.compareTo(BigDecimal.ZERO) > 0) {
-            Paragraph storeCreditParagraph = new Paragraph("Store Credit Used: -$" + totalCredits.toPlainString(), highlightFont);
-            storeCreditParagraph.setAlignment(Element.ALIGN_RIGHT);
-            document.add(storeCreditParagraph);
+        if (storeCreditApplied && totalAvailableCredits.compareTo(BigDecimal.ZERO) > 0) {
+            // Display total available store credits
+            Paragraph totalAvailableCreditsParagraph = new Paragraph("Total Available Store Credits: $" + totalAvailableCredits.toPlainString(), highlightFont);
+            totalAvailableCreditsParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(totalAvailableCreditsParagraph);
+
+            // Display applied store credit
+            if (appliedStoreCredit.compareTo(BigDecimal.ZERO) > 0) {
+                Paragraph storeCreditAppliedParagraph = new Paragraph("Store Credit Applied: -$" + appliedStoreCredit.toPlainString(), highlightFont);
+                storeCreditAppliedParagraph.setAlignment(Element.ALIGN_RIGHT);
+                document.add(storeCreditAppliedParagraph);
+            }
         }
 
         // Display total cost in a highlighted fashion
