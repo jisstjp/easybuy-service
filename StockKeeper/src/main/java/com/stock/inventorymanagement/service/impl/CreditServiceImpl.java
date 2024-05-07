@@ -102,6 +102,10 @@ public class CreditServiceImpl implements CreditService {
             }
 
             BigDecimal creditAmount = credit.getAmount();
+            if (creditAmount == null || creditAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                continue; // Skip credits with null or non-positive amounts
+            }
+
             if (creditAmount.compareTo(amountToSubtract) >= 0) {
                 credit.setAmount(creditAmount.subtract(amountToSubtract));
                 credit.setStatus(credit.getAmount().compareTo(BigDecimal.ZERO) == 0 ? "USED" : "ACTIVE");

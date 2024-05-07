@@ -76,7 +76,7 @@ public class CustomerController extends BaseController {
                                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!hasAnyRole(request, authentication,"ROLE_ADMIN")) {
+        if (!hasAnyRole(request, authentication,"ROLE_ADMIN","SALES_PERSON")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal desiredCreditToApply = Optional.ofNullable(orderDto.getStoreCreditApplied()).orElse(BigDecimal.ZERO);
         desiredCreditToApply = desiredCreditToApply.min(availableStoreCredit).min(totalPrice);
         totalPrice = totalPrice.subtract(desiredCreditToApply);
-        creditService.subtractCredit(userId, desiredCreditToApply);
+        creditService.subtractCredit(customerDto.getId(), desiredCreditToApply);
 
         Order order = new Order();
         order.setUser(user);
